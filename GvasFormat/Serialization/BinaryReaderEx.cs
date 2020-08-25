@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 
 namespace GvasFormat.Serialization
@@ -36,6 +37,25 @@ namespace GvasFormat.Serialization
             if (valueBytes.Length > 0)
                 writer.Write(valueBytes);
             writer.Write((byte)0);
+        }
+
+        public static void WriteInt32(this BinaryWriter writer, long value)
+        {
+            writer.Write(BitConverter.GetBytes(value));
+        }
+
+        public static void WriteInt16(this BinaryWriter writer, int value)
+        {
+            writer.Write(BitConverter.GetBytes(value));
+        }
+        public static void WriteSingle(this BinaryWriter writer, float value)
+        {
+            writer.Write(BitConverter.GetBytes(value));
+        }
+
+        public static void WriteDouble(this BinaryWriter writer, double value)
+        {
+            writer.Write(BitConverter.GetBytes(value));
         }
     }
 }

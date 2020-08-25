@@ -21,7 +21,11 @@ namespace GvasConverter
             var ext = Path.GetExtension(args[0]).ToLower();
             if (ext == ".json")
             {
-                Console.WriteLine("Not implemented atm");
+                Console.WriteLine("Not implemented atm, WIP");
+                Console.WriteLine("Loading json...");
+                Gvas data = (Gvas)JsonConvert.DeserializeObject(File.ReadAllText(args[0]));
+                var stream = File.Open(Path.GetFileNameWithoutExtension(args[0]) + ".sav", FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write);
+                UESerializer.Write(stream, data);
             }
             else
             {

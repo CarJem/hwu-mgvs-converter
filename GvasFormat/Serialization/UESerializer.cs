@@ -43,5 +43,52 @@ namespace GvasFormat.Serialization
                 return result;
             }
         }
+
+        public static void Write(FileStream stream, Gvas data)
+        {
+            using (BinaryWriter writer = new BinaryWriter(stream, Encoding.ASCII, true))
+            {
+                writer.Write(Gvas.Header);
+
+                writer.WriteInt32(data.SaveGameVersion);
+                writer.WriteInt32(data.PackageVersion);
+                writer.WriteInt16(data.EngineVersion.Major);
+                writer.WriteInt16(data.EngineVersion.Minor);
+                writer.WriteInt16(data.EngineVersion.Patch);
+                writer.WriteInt32(data.EngineVersion.Build);
+                writer.WriteUEString(data.EngineVersion.BuildId);
+                writer.WriteInt32(data.CustomFormatVersion);
+                writer.WriteInt32(data.CustomFormatData.Count);
+                for (var i = 0; i < data.CustomFormatData.Count; i++)
+                {
+                    var entry = data.CustomFormatData.Entries[i];
+                    writer.Write(entry.Id.ToByteArray());
+                    writer.WriteInt32(entry.Value);
+                }
+                writer.WriteUEString(data.SaveGameType);
+
+                foreach (UEProperty prop in data.Properties)
+                {
+                    if (prop is UEArrayProperty) ((UEArrayProperty)prop).Serialize(writer);
+                    else if (prop is UEBoolProperty) ((UEBoolProperty)prop).Serialize(writer);
+                    else if (prop is UEByteProperty) ((UEByteProperty)prop).Serialize(writer);
+                    else if (prop is UEEnumProperty) ((UEEnumProperty)prop).Serialize(writer);
+                    else if (prop is UEFloatProperty) ((UEFloatProperty)prop).Serialize(writer);
+                    else if (prop is UEIntProperty) ((UEIntProperty)prop).Serialize(writer);
+                    else if (prop is UEMapProperty) ((UEMapProperty)prop).Serialize(writer);
+                    else if (prop is UENoneProperty) ((UENoneProperty)prop).Serialize(writer);
+                    else if (prop is UEStringProperty) ((UEStringProperty)prop).Serialize(writer);
+                    else if (prop is UETextProperty) ((UETextProperty)prop).Serialize(writer);
+                    else if (prop is UEGenericStructProperty) ((UEGenericStructProperty)prop).Serialize(writer);
+                    else if (prop is UEDateTimeStructProperty) ((UEDateTimeStructProperty)prop).Serialize(writer);
+                    else if (prop is UEDTGReskinDecalStructProperty) ((UEDTGReskinDecalStructProperty)prop).Serialize(writer);
+                    else if (prop is UEGuidStructProperty) ((UEGuidStructProperty)prop).Serialize(writer);
+                    else if (prop is UELinearColorStructProperty) ((UELinearColorStructProperty)prop).Serialize(writer);
+                    else if (prop is UEQuaternionStructProperty) ((UEQuaternionStructProperty)prop).Serialize(writer);
+                    else if (prop is UEVectorStructProperty) ((UEVectorStructProperty)prop).Serialize(writer);
+                    else throw new FormatException($"Property {prop.ToString()} is not of known type");
+                }
+            }
+        }
     }
 }
