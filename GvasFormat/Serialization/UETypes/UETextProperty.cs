@@ -24,11 +24,11 @@ namespace GvasFormat.Serialization.UETypes
                 throw new FormatException($"Offset: 0x{reader.BaseStream.Position - 8:x8}. Expected text ??? {0x00}, but was {Flags:x16}");
 */
 
-            terminator = reader.ReadByte();
-            if (terminator != 0)
-                throw new FormatException($"Offset: 0x{reader.BaseStream.Position - 1:x8}. Expected terminator (0x00), but was (0x{terminator:x2})");
+            //terminator = reader.ReadByte();
+            //if (terminator != 0)
+            //    throw new FormatException($"Offset: 0x{reader.BaseStream.Position - 1:x8}. Expected terminator (0x00), but was (0x{terminator:x2})");
 
-            Id = reader.ReadUEString();
+            Id = reader.ReadByte().ToString();
             Value = reader.ReadUEString();
         }
 

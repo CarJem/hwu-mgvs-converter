@@ -56,6 +56,15 @@ namespace GvasFormat.Serialization.UETypes
                 case "LinearColor":
                     result = new UELinearColorStructProperty(reader);
                     break;
+                case "DTGReskinDecal":
+                    result = new UEDTGReskinDecalStructProperty(reader);
+                    break;
+                case "Quat":
+                    result = new UEQuaternionStructProperty(reader);
+                    break;
+                //case "ModelTransform":
+                //    result = new UEModelTransformStructProperty(reader);
+                //    break;
                 default:
                     var tmp = new UEGenericStructProperty();
                         while (Read(reader) is UEProperty prop)
