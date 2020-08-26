@@ -6,6 +6,9 @@ namespace GvasFormat.Serialization.UETypes
     [DebuggerDisplay("", Name = "{Name}")]
     public sealed class UENoneProperty : UEProperty
     {
-        public override void Serialize(BinaryWriter writer) { throw new System.NotImplementedException(); }
+        public override void Serialize(BinaryWriter writer)
+        {
+            writer.WriteUEString("None");
+        }
     }
 }

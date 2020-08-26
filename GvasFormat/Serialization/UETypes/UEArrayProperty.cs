@@ -36,7 +36,31 @@ namespace GvasFormat.Serialization.UETypes
                 }
             }
         }
-        public override void Serialize(BinaryWriter writer) { throw new NotImplementedException(); }
+        public override void Serialize(BinaryWriter writer)
+        {
+            writer.WriteUEString(Name);
+            writer.WriteUEString(Type);
+            writer.WriteInt64(0); //valueLength
+            writer.WriteUEString(ItemType);
+            writer.Write(false); //terminator
+            writer.WriteInt32(Items.Length);
+
+            foreach (UEProperty prop in Items)
+            {
+                switch (ItemType)
+                {
+                    case "StructProperty":
+                        ((UEStructProperty)prop).Serialize(writer);
+                        break;
+                    case "ByteProperty":
+                        ((UEByteProperty)prop).Serialize(writer, 0);
+                        break;
+                    default:
+                        throw new NotImplementedException($"ArrayProperty of type {ItemType}");
+                }
+                prop.Serialize(writer);
+            }
+        }
 
         public string ItemType;
         public UEProperty[] Items;

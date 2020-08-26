@@ -31,7 +31,20 @@ namespace GvasFormat.Serialization.UETypes
             return new UEProperty[]{ new UEByteProperty {Value = bytes.AsHex()}};
         }
 
-        public override void Serialize(BinaryWriter writer) => throw new NotImplementedException();
+        public override void Serialize(BinaryWriter writer)
+        {
+            writer.WriteUEString(Name);
+            writer.WriteUEString(Type);
+            writer.WriteInt64(4+Value.AsBytes().Length); //valueLength
+            writer.Write(false); //terminator
+            writer.WriteInt32(Value.AsBytes().Length);
+            writer.Write(Value.AsBytes());
+        }
+
+        public void Serialize(BinaryWriter writer, int count)
+        {
+            writer.Write(Value.AsBytes());
+        }
 
         public string Value;
     }

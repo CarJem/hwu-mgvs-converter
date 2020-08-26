@@ -45,9 +45,6 @@ namespace GvasFormat.Serialization
                 case "ByteProperty":
                     result = UEByteProperty.Read(reader, valueLength);
                     break;
-                //case "SoftObjectProperty":
-                //    result = new UESoftObjectProperty(reader, valueLength);
-                //    break;
                 default:
                     throw new FormatException($"Offset: 0x{itemOffset:x8}. Unknown value type '{type}' of item '{name}'");
             }

@@ -62,9 +62,6 @@ namespace GvasFormat.Serialization.UETypes
                 case "Quat":
                     result = new UEQuaternionStructProperty(reader);
                     break;
-                //case "ModelTransform":
-                //    result = new UEModelTransformStructProperty(reader);
-                //    break;
                 default:
                     var tmp = new UEGenericStructProperty();
                         while (Read(reader) is UEProperty prop)
@@ -76,11 +73,9 @@ namespace GvasFormat.Serialization.UETypes
                     result = tmp;
                     break;
             }
-            result.Type = type;
+            result.StructType = type;
             return result;
         }
-
-        public override void Serialize(BinaryWriter writer) { throw new NotImplementedException(); }
 
         public string StructType;
         //public Guid Unknown = Guid.Empty;

@@ -16,5 +16,17 @@ namespace GvasFormat.Serialization.UETypes
         }
 
         public float R, G, B, A;
+
+        public override void Serialize(BinaryWriter writer)
+        {
+            writer.WriteUEString(Name);
+            writer.WriteUEString(Type);
+            writer.WriteInt64(0); //valueLength
+            writer.WriteUEString(StructType);
+            writer.WriteSingle(R);
+            writer.WriteSingle(G);
+            writer.WriteSingle(B);
+            writer.WriteSingle(A);
+        }
     }
 }

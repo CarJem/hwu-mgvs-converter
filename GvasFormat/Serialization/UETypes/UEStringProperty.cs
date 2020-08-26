@@ -25,21 +25,11 @@ namespace GvasFormat.Serialization.UETypes
 
         public override void Serialize(BinaryWriter writer)
         {
-            if (Value == null)
-            {
-                writer.Write(0L);
-                writer.Write((byte)0);
-            }
-            else
-            {
-                var bytes = Utf8.GetBytes(Value);
-                writer.Write(bytes.Length + 6L);
-                writer.Write((byte)0);
-                writer.Write(bytes.Length+1);
-                if (bytes.Length > 0)
-                    writer.Write(bytes);
-                writer.Write((byte)0);
-            }
+            writer.WriteUEString(Name);
+            writer.WriteUEString(Type);
+            writer.WriteInt64(0); //valueLength
+            writer.Write(false); //terminator
+            writer.WriteUEString(Value);
         }
 
         public string Value;

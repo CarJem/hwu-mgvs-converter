@@ -20,7 +20,14 @@ namespace GvasFormat.Serialization.UETypes
             Value = reader.ReadSingle();
         }
 
-        public override void Serialize(BinaryWriter writer) { throw new NotImplementedException(); }
+        public override void Serialize(BinaryWriter writer)
+        {
+            writer.WriteUEString(Name);
+            writer.WriteUEString(Type);
+            writer.WriteInt64(sizeof(float)); //valueLength
+            writer.Write(false); //terminator
+            writer.WriteSingle(Value);
+        }
 
         public float Value;
     }

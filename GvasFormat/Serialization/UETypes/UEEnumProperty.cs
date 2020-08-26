@@ -24,7 +24,15 @@ namespace GvasFormat.Serialization.UETypes
             Value = reader.ReadUEString();
         }
 
-        public override void Serialize(BinaryWriter writer) => throw new NotImplementedException();
+        public override void Serialize(BinaryWriter writer)
+        {
+            writer.WriteUEString(Name);
+            writer.WriteUEString(Type);
+            writer.WriteInt64(Utf8.GetBytes(Value).Length+4+1); //valueLength
+            writer.WriteUEString(EnumType);
+            writer.Write(false); //terminator
+            writer.WriteUEString(Value);
+        }
 
         public string EnumType;
         public string Value;

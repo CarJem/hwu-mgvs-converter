@@ -69,24 +69,48 @@ namespace GvasFormat.Serialization
 
                 foreach (UEProperty prop in data.Properties)
                 {
-                    if (prop is UEArrayProperty) ((UEArrayProperty)prop).Serialize(writer);
-                    else if (prop is UEBoolProperty) ((UEBoolProperty)prop).Serialize(writer);
-                    else if (prop is UEByteProperty) ((UEByteProperty)prop).Serialize(writer);
-                    else if (prop is UEEnumProperty) ((UEEnumProperty)prop).Serialize(writer);
-                    else if (prop is UEFloatProperty) ((UEFloatProperty)prop).Serialize(writer);
-                    else if (prop is UEIntProperty) ((UEIntProperty)prop).Serialize(writer);
-                    else if (prop is UEMapProperty) ((UEMapProperty)prop).Serialize(writer);
-                    else if (prop is UENoneProperty) ((UENoneProperty)prop).Serialize(writer);
-                    else if (prop is UEStringProperty) ((UEStringProperty)prop).Serialize(writer);
-                    else if (prop is UETextProperty) ((UETextProperty)prop).Serialize(writer);
-                    else if (prop is UEGenericStructProperty) ((UEGenericStructProperty)prop).Serialize(writer);
-                    else if (prop is UEDateTimeStructProperty) ((UEDateTimeStructProperty)prop).Serialize(writer);
-                    else if (prop is UEDTGReskinDecalStructProperty) ((UEDTGReskinDecalStructProperty)prop).Serialize(writer);
-                    else if (prop is UEGuidStructProperty) ((UEGuidStructProperty)prop).Serialize(writer);
-                    else if (prop is UELinearColorStructProperty) ((UELinearColorStructProperty)prop).Serialize(writer);
-                    else if (prop is UEQuaternionStructProperty) ((UEQuaternionStructProperty)prop).Serialize(writer);
-                    else if (prop is UEVectorStructProperty) ((UEVectorStructProperty)prop).Serialize(writer);
-                    else throw new FormatException($"Property {prop.ToString()} is not of known type");
+                    if (prop.Name == "None") {
+                        ((UENoneProperty)prop).Serialize(writer);
+                        continue;
+                    }
+                    switch (prop.Type)
+                    {
+                        case "BoolProperty":
+                            ((UEBoolProperty)prop).Serialize(writer);
+                            break;
+                        case "IntProperty":
+                            ((UEIntProperty)prop).Serialize(writer);
+                            break;
+                        case "FloatProperty":
+                            ((UEFloatProperty)prop).Serialize(writer);
+                            break;
+                        case "NameProperty":
+                        case "StrProperty":
+                        case "SoftObjectProperty":
+                        case "ObjectProperty":
+                            ((UEStringProperty)prop).Serialize(writer);
+                            break;
+                        case "TextProperty":
+                            ((UETextProperty)prop).Serialize(writer);
+                            break;
+                        case "EnumProperty":
+                            ((UEEnumProperty)prop).Serialize(writer);
+                            break;
+                        case "StructProperty":
+                            ((UEStructProperty)prop).Serialize(writer);
+                            break;
+                        case "ArrayProperty":
+                            ((UEArrayProperty)prop).Serialize(writer);
+                            break;
+                        case "MapProperty":
+                            ((UEMapProperty)prop).Serialize(writer);
+                            break;
+                        case "ByteProperty":
+                            ((UEByteProperty)prop).Serialize(writer);
+                            break;
+                        default:
+                            throw new FormatException($"Property {prop.Name} has unknown type {prop.Type}");
+                    }
                 }
             }
         }

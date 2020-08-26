@@ -32,7 +32,16 @@ namespace GvasFormat.Serialization.UETypes
             Value = reader.ReadUEString();
         }
 
-        public override void Serialize(BinaryWriter writer) => throw new NotImplementedException();
+        public override void Serialize(BinaryWriter writer)
+        {
+            writer.WriteUEString(Name);
+            writer.WriteUEString(Type);
+            writer.WriteInt64(8 + 1 + Utf8.GetByteCount(Value) + 4 + 1); //valueLength
+            writer.Write(false); //terminator
+            writer.WriteInt64(Flags);
+            writer.Write(Byte.Parse(Id));
+            writer.WriteUEString(Value);
+        }
 
         public long Flags;
         public string Id;

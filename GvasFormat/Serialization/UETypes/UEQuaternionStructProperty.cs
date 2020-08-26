@@ -7,15 +7,27 @@ namespace GvasFormat.Serialization.UETypes
 
         public UEQuaternionStructProperty(BinaryReader reader)
         {
-            X = reader.ReadInt32();
-            Y = reader.ReadInt32();
-            I = reader.ReadInt32();
-            J = reader.ReadInt32();
+            X = reader.ReadSingle();
+            Y = reader.ReadSingle();
+            I = reader.ReadSingle();
+            J = reader.ReadSingle();
         }
 
-        public long X;
-        public long Y;
-        public long I;
-        public long J;
+        public float X;
+        public float Y;
+        public float I;
+        public float J;
+
+        public override void Serialize(BinaryWriter writer)
+        {
+            writer.WriteUEString(Name);
+            writer.WriteUEString(Type);
+            writer.WriteInt64(0); //valueLength
+            writer.WriteUEString(StructType);
+            writer.WriteSingle(X);
+            writer.WriteSingle(Y);
+            writer.WriteSingle(I);
+            writer.WriteSingle(J);
+        }
     }
 }

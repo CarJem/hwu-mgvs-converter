@@ -39,7 +39,18 @@ namespace GvasFormat.Serialization.UETypes
                 Map.Add(new UEKeyValuePair{Key = key, Values = values});
             }
         }
-        public override void Serialize(BinaryWriter writer) { throw new NotImplementedException(); }
+        public override void Serialize(BinaryWriter writer)
+        {
+            writer.WriteUEString(Name);
+            writer.WriteUEString(Type);
+            writer.WriteInt64(0); //valueLength
+            writer.WriteUEString(Map[0].Key.Type);
+            writer.WriteUEString(Map[0].Values[0].Type);
+            writer.WriteInt16(0); //unknown
+            writer.Write(false); //unknown
+            writer.Write(Map.Count);
+            throw new NotImplementedException();
+        }
 
         public List<UEKeyValuePair> Map = new List<UEKeyValuePair>();
 

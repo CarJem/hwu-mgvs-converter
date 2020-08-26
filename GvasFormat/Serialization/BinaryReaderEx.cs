@@ -39,12 +39,17 @@ namespace GvasFormat.Serialization
             writer.Write((byte)0);
         }
 
-        public static void WriteInt32(this BinaryWriter writer, long value)
+        public static void WriteInt64(this BinaryWriter writer, long value)
         {
             writer.Write(BitConverter.GetBytes(value));
         }
 
-        public static void WriteInt16(this BinaryWriter writer, int value)
+        public static void WriteInt32(this BinaryWriter writer, int value)
+        {
+            writer.Write(BitConverter.GetBytes(value));
+        }
+
+        public static void WriteInt16(this BinaryWriter writer, short value)
         {
             writer.Write(BitConverter.GetBytes(value));
         }
