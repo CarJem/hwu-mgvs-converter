@@ -15,12 +15,8 @@ namespace GvasFormat.Serialization.UETypes
 
         public DateTime Value;
 
-        public override void Serialize(BinaryWriter writer)
+        public override void SerializeStructProp(BinaryWriter writer)
         {
-            writer.WriteUEString(Name);
-            writer.WriteUEString(Type);
-            writer.WriteInt64(8); //valueLength
-            writer.WriteUEString(StructType);
             writer.WriteInt64(Value.ToBinary());
         }
     }

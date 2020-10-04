@@ -69,49 +69,10 @@ namespace GvasFormat.Serialization
 
                 foreach (UEProperty prop in data.Properties)
                 {
-                    if (prop.Name == "None") {
-                        ((UENoneProperty)prop).Serialize(writer);
-                        continue;
-                    }
-                    switch (prop.Type)
-                    {
-                        case "BoolProperty":
-                            ((UEBoolProperty)prop).Serialize(writer);
-                            break;
-                        case "IntProperty":
-                            ((UEIntProperty)prop).Serialize(writer);
-                            break;
-                        case "FloatProperty":
-                            ((UEFloatProperty)prop).Serialize(writer);
-                            break;
-                        case "NameProperty":
-                        case "StrProperty":
-                        case "SoftObjectProperty":
-                        case "ObjectProperty":
-                            ((UEStringProperty)prop).Serialize(writer);
-                            break;
-                        case "TextProperty":
-                            ((UETextProperty)prop).Serialize(writer);
-                            break;
-                        case "EnumProperty":
-                            ((UEEnumProperty)prop).Serialize(writer);
-                            break;
-                        case "StructProperty":
-                            ((UEStructProperty)prop).Serialize(writer);
-                            break;
-                        case "ArrayProperty":
-                            ((UEArrayProperty)prop).Serialize(writer);
-                            break;
-                        case "MapProperty":
-                            ((UEMapProperty)prop).Serialize(writer);
-                            break;
-                        case "ByteProperty":
-                            ((UEByteProperty)prop).Serialize(writer);
-                            break;
-                        default:
-                            throw new FormatException($"Property {prop.Name} has unknown type {prop.Type}");
-                    }
+                    prop.Serialize(writer);
                 }
+
+                writer.WriteInt32(0);
             }
         }
     }

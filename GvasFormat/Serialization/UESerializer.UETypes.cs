@@ -50,6 +50,7 @@ namespace GvasFormat.Serialization
             }
             result.Name = name;
             result.Type = type;
+            result.ValueLength = valueLength;
             return result;
         }
 
@@ -71,6 +72,7 @@ namespace GvasFormat.Serialization
             {
                 item.Name = name;
                 item.Type = type;
+                item.ValueLength = valueLength;
             }
             return result;
         }

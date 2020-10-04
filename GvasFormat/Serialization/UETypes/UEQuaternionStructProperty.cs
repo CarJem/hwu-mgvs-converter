@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace GvasFormat.Serialization.UETypes
 {
@@ -13,17 +14,17 @@ namespace GvasFormat.Serialization.UETypes
             J = reader.ReadSingle();
         }
 
+        public UEQuaternionStructProperty()
+        {
+        }
+
         public float X;
         public float Y;
         public float I;
         public float J;
 
-        public override void Serialize(BinaryWriter writer)
+        public override void SerializeStructProp(BinaryWriter writer)
         {
-            writer.WriteUEString(Name);
-            writer.WriteUEString(Type);
-            writer.WriteInt64(0); //valueLength
-            writer.WriteUEString(StructType);
             writer.WriteSingle(X);
             writer.WriteSingle(Y);
             writer.WriteSingle(I);

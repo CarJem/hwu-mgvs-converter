@@ -16,12 +16,8 @@ namespace GvasFormat.Serialization.UETypes
 
         public Guid Value;
 
-        public override void Serialize(BinaryWriter writer)
+        public override void SerializeStructProp(BinaryWriter writer)
         {
-            writer.WriteUEString(Name);
-            writer.WriteUEString(Type);
-            writer.WriteInt64(0); //valueLength
-            writer.WriteUEString(StructType);
             writer.Write(Value.ToByteArray());
         }
     }

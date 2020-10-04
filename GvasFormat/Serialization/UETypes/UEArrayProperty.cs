@@ -17,52 +17,43 @@ namespace GvasFormat.Serialization.UETypes
                 throw new FormatException($"Offset: 0x{reader.BaseStream.Position - 1:x8}. Expected terminator (0x00), but was (0x{terminator:x2})");
 
             // valueLength starts here
-            var count = reader.ReadInt32();
-            Items = new UEProperty[count];
+            Count = reader.ReadInt32();
+            Items = new UEProperty[Count];
 
             switch (ItemType)
             {
                 case "StructProperty":
-                    Items = Read(reader, count);
+                    Items = Read(reader, Count);
                     break;
                 case "ByteProperty":
-                    Items = UEByteProperty.Read(reader, valueLength, count);
+                    Items = UEByteProperty.Read(reader, valueLength, Count);
                     break;
                 default:
-                {
-                    for (var i = 0; i < count; i++)
-                        Items[i] = UESerializer.Deserialize(null, ItemType, -1, reader);
-                    break;
-                }
+                    {
+                        for (var i = 0; i < Count; i++)
+                            Items[i] = UESerializer.Deserialize(null, ItemType, -1, reader);
+                        break;
+                    }
             }
         }
-        public override void Serialize(BinaryWriter writer)
+
+        public override void SerializeProp(BinaryWriter writer)
         {
-            writer.WriteUEString(Name);
-            writer.WriteUEString(Type);
-            writer.WriteInt64(0); //valueLength
             writer.WriteUEString(ItemType);
             writer.Write(false); //terminator
-            writer.WriteInt32(Items.Length);
+            writer.WriteInt32(Count);
 
-            foreach (UEProperty prop in Items)
+            for (int i=0; i<Items.Length; i++)
             {
-                switch (ItemType)
-                {
-                    case "StructProperty":
-                        ((UEStructProperty)prop).Serialize(writer);
-                        break;
-                    case "ByteProperty":
-                        ((UEByteProperty)prop).Serialize(writer, 0);
-                        break;
-                    default:
-                        throw new NotImplementedException($"ArrayProperty of type {ItemType}");
-                }
-                prop.Serialize(writer);
+                UEProperty prop = Items[i];
+                if (i == 0) { prop.Serialize(writer); }
+                else if (prop is UEStructProperty) { ((UEStructProperty)prop).SerializeStructProp(writer); }
+                else { prop.SerializeProp(writer); }
             }
         }
 
         public string ItemType;
         public UEProperty[] Items;
+        public int Count;
     }
 }

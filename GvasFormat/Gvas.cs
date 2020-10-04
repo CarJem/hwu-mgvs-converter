@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using GvasFormat.Serialization.UETypes;
 
@@ -19,5 +20,7 @@ namespace GvasFormat
         public CustomFormatData CustomFormatData = new CustomFormatData();
         public string SaveGameType;
         public List<UEProperty> Properties = new List<UEProperty>();
+
+       
     }
 }

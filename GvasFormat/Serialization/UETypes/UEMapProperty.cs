@@ -13,8 +13,8 @@ namespace GvasFormat.Serialization.UETypes
         public UEMapProperty() { }
         public UEMapProperty(BinaryReader reader, long valueLength)
         {
-            var keyType = reader.ReadUEString();
-            var valueType = reader.ReadUEString();
+            KeyType = reader.ReadUEString();
+            ValueType = reader.ReadUEString();
             var unknown = reader.ReadBytes(5);
             if (unknown.Any(b => b != 0))
                 throw new InvalidOperationException($"Offset: 0x{reader.BaseStream.Position-5:x8}. Expected ??? to be 0, but was 0x{unknown.AsHex()}");
@@ -23,36 +23,54 @@ namespace GvasFormat.Serialization.UETypes
             for (var i = 0; i < count; i++)
             {
                 UEProperty key, value;
-                if (keyType == "StructProperty")
+                if (KeyType == "StructProperty")
                     key = Read(reader);
                 else
-                    key = UESerializer.Deserialize(null, keyType, -1, reader);
+                    key = UESerializer.Deserialize(null, KeyType, -1, reader);
                 var values = new List<UEProperty>();
                 do
                 {
-                    if (valueType == "StructProperty")
+                    if (ValueType == "StructProperty")
                         value = Read(reader);
                     else
-                        value = UESerializer.Deserialize(null, valueType, -1, reader);
+                        value = UESerializer.Deserialize(null, ValueType, -1, reader);
                     values.Add(value);
                 } while (!(value is UENoneProperty));
                 Map.Add(new UEKeyValuePair{Key = key, Values = values});
             }
+            if (count == 0)
+            {
+                //Read(reader);
+                Read(reader);
+            }
         }
-        public override void Serialize(BinaryWriter writer)
+        public override void SerializeProp(BinaryWriter writer)
         {
-            writer.WriteUEString(Name);
-            writer.WriteUEString(Type);
-            writer.WriteInt64(0); //valueLength
-            writer.WriteUEString(Map[0].Key.Type);
-            writer.WriteUEString(Map[0].Values[0].Type);
-            writer.WriteInt16(0); //unknown
+            writer.WriteUEString(KeyType);
+            writer.WriteUEString(ValueType);
+            writer.WriteInt32(0); //unknown
             writer.Write(false); //unknown
-            writer.Write(Map.Count);
-            throw new NotImplementedException();
+            writer.WriteInt32(Map.Count);
+
+            foreach (UEKeyValuePair p in Map)
+            {
+                p.Key.Serialize(writer);
+
+                foreach (UEProperty v in p.Values)
+                {
+                    v.Serialize(writer);
+                }
+            }
+            if (Map.Count == 0)
+            {
+               //new UENoneProperty().Serialize(writer);
+               new UENoneProperty().Serialize(writer);
+            }
         }
 
         public List<UEKeyValuePair> Map = new List<UEKeyValuePair>();
+        public string KeyType;
+        public string ValueType;
 
         public class UEKeyValuePair
         {

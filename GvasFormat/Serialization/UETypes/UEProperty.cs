@@ -7,8 +7,25 @@ namespace GvasFormat.Serialization.UETypes
     {
         public string Name;
         public string Type;
+        public long ValueLength;
 
-        public abstract void Serialize(BinaryWriter writer);
+        public abstract void SerializeProp(BinaryWriter writer);
+
+        public void Serialize(BinaryWriter writer)
+        {
+            if (Name == "None")
+            {
+                SerializeProp(writer);
+            }
+            else
+            {
+                writer.WriteUEString(Name);
+                writer.WriteUEString(Type);
+                writer.WriteInt64(ValueLength);
+                SerializeProp(writer);
+            }
+            
+        }
 
         public static UEProperty Read(BinaryReader reader)
         {

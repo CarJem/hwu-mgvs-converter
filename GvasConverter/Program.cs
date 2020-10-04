@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http.Headers;
 using System.Text;
 using GvasFormat;
 using GvasFormat.Serialization;
@@ -11,20 +12,20 @@ namespace GvasConverter
     {
         static void Main(string[] args)
         {
-            if (args.Length != 1)
+            if (args.Length != 2)
             {
                 Console.WriteLine("Usage:");
-                Console.WriteLine("  gvas-converter path_to_save_file|path_to_json");
+                Console.WriteLine("  gvas-converter infile outfile");
                 return;
             }
 
             var ext = Path.GetExtension(args[0]).ToLower();
             if (ext == ".json")
             {
-                Console.WriteLine("Not implemented atm, WIP");
                 Console.WriteLine("Loading json...");
-                Gvas data = (Gvas)JsonConvert.DeserializeObject(File.ReadAllText(args[0]));
-                var stream = File.Open(Path.GetFileNameWithoutExtension(args[0]) + ".sav", FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write);
+                Gvas data = JsonConvert.DeserializeObject<Gvas>(File.ReadAllText(args[0]),new GvasJsonConverter());
+                var stream = File.Open(args[1], FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write);
+                Console.WriteLine("Converting and saving file...");
                 UESerializer.Write(stream, data);
             }
             else

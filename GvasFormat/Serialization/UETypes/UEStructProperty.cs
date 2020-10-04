@@ -18,7 +18,7 @@ namespace GvasFormat.Serialization.UETypes
             if (terminator != 0)
                 throw new FormatException($"Offset: 0x{reader.BaseStream.Position - 1:x8}. Expected terminator (0x00), but was (0x{terminator:x2})");
 
-            return ReadStructValue(type, reader);
+            return ReadStructValue(type, reader, valueLength);
         }
 
         public static UEStructProperty[] Read(BinaryReader reader, long valueLength, int count)
@@ -32,13 +32,19 @@ namespace GvasFormat.Serialization.UETypes
             if (terminator != 0)
                 throw new FormatException($"Offset: 0x{reader.BaseStream.Position - 1:x8}. Expected terminator (0x00), but was (0x{terminator:x2})");
 
-            var result = new UEStructProperty[count];
+            var result = new UEStructProperty[Math.Max(count, 1)];
+            if (count == 0)
+            {
+                result[0] = new UEGenericStructProperty();
+                result[0].StructType = type;
+                return result;
+            }
             for (var i = 0; i < count; i++)
-                result[i] = ReadStructValue(type, reader);
+                result[i] = ReadStructValue(type, reader, valueLength);
             return result;
         }
 
-        protected static UEStructProperty ReadStructValue(string type, BinaryReader reader)
+        protected static UEStructProperty ReadStructValue(string type, BinaryReader reader, long valueLength)
         {
             UEStructProperty result;
             switch (type)
@@ -56,25 +62,29 @@ namespace GvasFormat.Serialization.UETypes
                 case "LinearColor":
                     result = new UELinearColorStructProperty(reader);
                     break;
-                case "DTGReskinDecal":
-                    result = new UEDTGReskinDecalStructProperty(reader);
-                    break;
+                /*case "Transform":
+                    result = new UETransformStructProperty(reader);
+                    break;*/
                 case "Quat":
                     result = new UEQuaternionStructProperty(reader);
                     break;
                 default:
-                    var tmp = new UEGenericStructProperty();
-                        while (Read(reader) is UEProperty prop)
-                        {
-                            tmp.Properties.Add(prop);
-                            if (prop is UENoneProperty)
-                                break;
-                        }
-                    result = tmp;
+                    result = new UEGenericStructProperty(reader);
                     break;
             }
             result.StructType = type;
+            result.ValueLength = valueLength;
             return result;
+        }
+
+        public abstract void SerializeStructProp(BinaryWriter writer);
+
+        public override void SerializeProp(BinaryWriter writer)
+        {
+            writer.WriteUEString(StructType);
+            writer.Write(Guid.Empty.ToByteArray());
+            writer.Write(false);
+            SerializeStructProp(writer);
         }
 
         public string StructType;
