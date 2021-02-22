@@ -20,6 +20,7 @@ namespace GvasFormat.Serialization.UETypes
 
         public override void SerializeStructProp(BinaryWriter writer)
         {
+            if (ValueLength == 0) return;
             writer.WriteSingle(R);
             writer.WriteSingle(G);
             writer.WriteSingle(B);

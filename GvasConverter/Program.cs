@@ -24,7 +24,7 @@ namespace GvasConverter
             {
                 Console.WriteLine("Loading json...");
                 Gvas data = JsonConvert.DeserializeObject<Gvas>(File.ReadAllText(args[0]),new GvasJsonConverter());
-                var stream = File.Open(args[1], FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write);
+                var stream = File.Open(args[1], FileMode.Create, FileAccess.Write);
                 Console.WriteLine("Converting and saving file...");
                 UESerializer.Write(stream, data);
             }
@@ -39,12 +39,11 @@ namespace GvasConverter
                 var json = JsonConvert.SerializeObject(save, new JsonSerializerSettings{Formatting = Formatting.Indented});
 
                 Console.WriteLine("Saving json...");
-                using (var stream = File.Open(args[0] + ".json", FileMode.Create, FileAccess.Write, FileShare.Read))
+                using (var stream = File.Open(args[1], FileMode.Create, FileAccess.Write, FileShare.Read))
                 using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))
                     writer.Write(json);
             }
             Console.WriteLine("Done.");
-            Console.ReadKey(true);
         }
     }
 }

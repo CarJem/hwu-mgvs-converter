@@ -10,7 +10,12 @@ namespace GvasFormat.Serialization.UETypes
         public UEIntProperty() { }
         public UEIntProperty(BinaryReader reader, long valueLength)
         {
+            if (valueLength == -1) {//IntProperty in MapProperty
+                Value = reader.ReadInt32();
+                return;
+            }
             var terminator = reader.ReadByte();
+
             if (terminator != 0)
                 throw new FormatException($"Offset: 0x{reader.BaseStream.Position - 1:x8}. Expected terminator (0x00), but was (0x{terminator:x2})");
 
@@ -22,7 +27,8 @@ namespace GvasFormat.Serialization.UETypes
 
         public override void SerializeProp(BinaryWriter writer)
         {
-            writer.Write(false); //terminator
+            if (ValueLength != -1)
+                writer.Write(false); //terminator
             writer.WriteInt32(Value);
         }
 

@@ -51,6 +51,8 @@ namespace GvasConverter
         {
             string t = o["Type"].ToString();
             string n = o["Name"].ToString();
+            if (n == "")
+                n = null;
 
             if (n == "None")
             {
@@ -145,16 +147,18 @@ namespace GvasConverter
             value.KeyType = o["KeyType"].ToString();
             value.ValueType = o["ValueType"].ToString();
 
-            foreach (JObject p in o["Map"])
+            foreach (JObject p in o["Map"].Children())
             {
                 UEMapProperty.UEKeyValuePair pair = new UEMapProperty.UEKeyValuePair();
                 pair.Key = ReadUEProperty((JObject)p["Key"]);
+                pair.Values = new List<UEProperty>();
 
                 foreach (JObject v in p["Values"])
                 {
                     pair.Values.Add(ReadUEProperty(v));
                 }
 
+                value.Map.Add(pair);
             }
 
             return value;
@@ -273,6 +277,7 @@ namespace GvasConverter
         private UELinearColorStructProperty ReadUELinearColorStructProperty(JObject o)
         {
             UELinearColorStructProperty value = new UELinearColorStructProperty();
+            if (int.Parse(o["ValueLength"].ToString()) == 0) return value;
 
             value.R = float.Parse(o["R"].ToString());
             value.G = float.Parse(o["G"].ToString());

@@ -13,7 +13,7 @@ namespace GvasFormat.Serialization.UETypes
 
         public void Serialize(BinaryWriter writer)
         {
-            if (Name == "None")
+            if (Name == "None" || Name == null)
             {
                 SerializeProp(writer);
             }
@@ -24,7 +24,7 @@ namespace GvasFormat.Serialization.UETypes
                 writer.WriteInt64(ValueLength);
                 SerializeProp(writer);
             }
-            
+
         }
 
         public static UEProperty Read(BinaryReader reader)
