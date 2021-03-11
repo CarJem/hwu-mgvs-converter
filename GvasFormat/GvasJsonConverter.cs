@@ -127,7 +127,9 @@ namespace GvasConverter
 
         private UEBoolProperty ReadUEBoolProperty(JObject o)
         {
-            throw new NotImplementedException();
+            var value = new UEBoolProperty();
+            value.Value = bool.Parse(o["Value"].ToString());
+            return value;
         }
 
         private UEEnumProperty ReadUEEnumProperty(JObject o)
