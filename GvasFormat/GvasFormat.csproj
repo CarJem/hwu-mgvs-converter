@@ -5,6 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Serialization\UETypes\UEArrayByteProperty.cs" />
+    <Compile Remove="Serialization\UETypes\UEArrayStructProperty.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>
 

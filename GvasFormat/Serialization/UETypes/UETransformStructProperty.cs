@@ -13,13 +13,13 @@ namespace GvasFormat.Serialization.UETypes
 
         public UETransformStructProperty(BinaryReader reader)
         {
-            while (Read(reader) is UEProperty prop)
+            while (Deserialize(reader) is UEProperty prop)
             {
                 Transform.Add(prop);
                 if (prop is UENoneProperty)
                     break;
             }
-            while (Read(reader) is UEProperty prop)
+            while (Deserialize(reader) is UEProperty prop)
             {
                 Model.Add(prop);
                 if (prop is UENoneProperty)

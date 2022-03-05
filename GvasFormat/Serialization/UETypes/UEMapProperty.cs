@@ -24,16 +24,16 @@ namespace GvasFormat.Serialization.UETypes
             {
                 UEProperty key, value;
                 if (KeyType == "StructProperty")
-                    key = Read(reader);
+                    key = Deserialize(reader);
                 else
-                    key = UESerializer.Deserialize(null, KeyType, -1, reader);
+                    key = UESerializer.DeserializeProperty(null, KeyType, -1, reader);
                 var values = new List<UEProperty>();
                 do
                 {
                     if (ValueType == "StructProperty")
-                        value = Read(reader);
+                        value = Deserialize(reader);
                     else
-                        value = UESerializer.Deserialize(null, ValueType, -1, reader);
+                        value = UESerializer.DeserializeProperty(null, ValueType, -1, reader);
                     values.Add(value);
                 } while (!(value is UENoneProperty));
                 Map.Add(new UEKeyValuePair{Key = key, Values = values});
@@ -41,7 +41,7 @@ namespace GvasFormat.Serialization.UETypes
             if (count == 0)
             {
                 //Read(reader);
-                Read(reader);
+                Deserialize(reader);
             }
         }
         public override void SerializeProp(BinaryWriter writer)

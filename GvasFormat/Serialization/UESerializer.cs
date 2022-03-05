@@ -37,8 +37,10 @@ namespace GvasFormat.Serialization
                 }
                 result.SaveGameType = reader.ReadUEString();
 
-                while (UEProperty.Read(reader) is UEProperty prop)
+                while (UEProperty.Deserialize(reader) is UEProperty prop)
                     result.Properties.Add(prop);
+
+                result.Leftovers = reader.ReadBytes((int)(reader.BaseStream.Length - reader.BaseStream.Position));
 
                 return result;
             }
@@ -73,6 +75,7 @@ namespace GvasFormat.Serialization
                 }
 
                 writer.WriteInt32(0);
+                writer.Write(data.Leftovers);
             }
         }
     }

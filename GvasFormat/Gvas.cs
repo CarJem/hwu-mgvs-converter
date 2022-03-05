@@ -12,7 +12,7 @@ namespace GvasFormat
      */
     public class Gvas
     {
-        public static readonly byte[] Header = Encoding.ASCII.GetBytes("GVAS");
+        public static readonly byte[] Header = Encoding.ASCII.GetBytes("mgvs");
         public int SaveGameVersion;
         public int PackageVersion;
         public EngineVersion EngineVersion = new EngineVersion();
@@ -20,7 +20,7 @@ namespace GvasFormat
         public CustomFormatData CustomFormatData = new CustomFormatData();
         public string SaveGameType;
         public List<UEProperty> Properties = new List<UEProperty>();
-
+        public byte[] Leftovers;
        
     }
 }

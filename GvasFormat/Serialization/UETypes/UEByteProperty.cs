@@ -14,35 +14,19 @@ namespace GvasFormat.Serialization.UETypes
         public UEByteProperty() { }
         public static UEByteProperty Read(BinaryReader reader, long valueLength)
         {
-            var terminator = reader.ReadByte();
-            if (terminator != 0)
-                throw new FormatException($"Offset: 0x{reader.BaseStream.Position - 1:x8}. Expected terminator (0x00), but was (0x{terminator:x2})");
-
-            // valueLength starts here
+            var terminator = reader.ReadTerminator();
             var arrayLength = reader.ReadInt32();
             var bytes = reader.ReadBytes(arrayLength);
-            return new UEByteProperty {Value = bytes.AsHex()};
-        }
-
-        public static UEProperty[] Read(BinaryReader reader, long valueLength, int count)
-        {
-            // valueLength starts here
-            var bytes = reader.ReadBytes(count);
-            return new UEProperty[]{ new UEByteProperty {Value = bytes.AsHex()}};
+            return new UEByteProperty {Value = bytes};
         }
 
         public override void SerializeProp(BinaryWriter writer)
         {
             writer.Write(false); //terminator
-            writer.WriteInt32(Value.AsBytes().Length);
-            writer.Write(Value.AsBytes());
+            writer.WriteInt32(Value.Length);
+            writer.Write(Value);
         }
 
-        public void Serialize(BinaryWriter writer, int count)
-        {
-            writer.Write(Value.AsBytes());
-        }
-
-        public string Value;
+        public byte[] Value;
     }
 }

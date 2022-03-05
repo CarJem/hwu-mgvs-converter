@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using GvasFormat.Serialization.HWTypes;
 using GvasFormat.Serialization.UETypes;
 
 namespace GvasFormat.Serialization
 {
     public static partial class UESerializer
     {
-        internal static UEProperty Deserialize(string name, string type, long valueLength, BinaryReader reader)
+        internal static UEProperty DeserializeProperty(string name, string type, long valueLength, BinaryReader reader)
         {
             UEProperty result;
             var itemOffset = reader.BaseStream.Position;
@@ -22,10 +24,16 @@ namespace GvasFormat.Serialization
                     result = new UEFloatProperty(reader, valueLength);
                     break;
                 case "NameProperty":
+                    result = new UENameProperty(reader, valueLength);
+                    break;
                 case "StrProperty":
-                case "SoftObjectProperty":
-                case "ObjectProperty":
                     result = new UEStringProperty(reader, valueLength);
+                    break;
+                case "SoftObjectProperty":
+                    result = new UEObjectProperty(reader, valueLength);
+                    break;
+                case "ObjectProperty":
+                    result = new UEObjectProperty(reader, valueLength);
                     break;
                 case "TextProperty":
                     result = new UETextProperty(reader, valueLength);
@@ -42,6 +50,9 @@ namespace GvasFormat.Serialization
                 case "MapProperty":
                     result = new UEMapProperty(reader, valueLength);
                     break;
+                case "SetProperty":
+                    result = new UESetProperty(reader, valueLength);
+                    break;
                 case "ByteProperty":
                     result = UEByteProperty.Read(reader, valueLength);
                     break;
@@ -53,27 +64,41 @@ namespace GvasFormat.Serialization
             result.ValueLength = valueLength;
             return result;
         }
-
-        internal static UEProperty[] Deserialize(string name, string type, long valueLength, int count, BinaryReader reader)
+        internal static UEStructProperty DeserializeStruct(string type, long valueLength, BinaryReader reader)
         {
-            UEProperty[] result;
+            UEStructProperty result;
             switch (type)
             {
-                case "StructProperty":
-                    result = UEStructProperty.Read(reader, valueLength, count);
+                case "DateTime":
+                    result = new UEDateTimeStructProperty(reader);
                     break;
-                case "ByteProperty":
-                    result = UEByteProperty.Read(reader, valueLength, count);
+                case "Guid":
+                    result = new UEGuidStructProperty(reader);
+                    break;
+                case "Vector":
+                    result = new UEVectorStructProperty(reader);
+                    break;
+                case "Rotator":
+                    result = new UEVectorStructProperty(reader);
+                    break;
+                case "LinearColor":
+                    result = new UELinearColorStructProperty(reader);
+                    break;
+                case "Transform":
+                    result = new UETransformStructProperty(reader);
+                    break;
+                case "Quat":
+                    result = new UEQuaternionStructProperty(reader);
+                    break;
+                case "VehicleEditorProject":
+                    result = new HWUVehicleEditorProject(reader);
                     break;
                 default:
-                    throw new FormatException($"Unknown value type '{type}' of item '{name}'");
+                    result = new UEGenericStructProperty(reader);
+                    break;
             }
-            foreach (var item in result)
-            {
-                item.Name = name;
-                item.Type = type;
-                item.ValueLength = valueLength;
-            }
+            result.StructType = type;
+            result.ValueLength = valueLength;
             return result;
         }
     }

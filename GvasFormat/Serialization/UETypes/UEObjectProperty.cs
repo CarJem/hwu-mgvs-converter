@@ -1,0 +1,26 @@
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+
+namespace GvasFormat.Serialization.UETypes
+{
+    [DebuggerDisplay("{Value}", Name = "{Name}")]
+    public sealed class UEObjectProperty : UEProperty
+    {
+        public UEObjectProperty() { }
+        public UEObjectProperty(BinaryReader reader, long valueLength)
+        {
+            var terminator = reader.ReadByte();
+            Value = reader.ReadBytes((int)valueLength);
+        }
+
+        public override void SerializeProp(BinaryWriter writer)
+        {
+            writer.Write(false); //terminator
+            writer.Write(Value);
+        }
+
+        public byte[] Value;
+    }
+}

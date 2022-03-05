@@ -14,7 +14,7 @@ namespace GvasFormat.Serialization.UETypes
 
         public UEGenericStructProperty(BinaryReader reader)
         {
-            while (Read(reader) is UEProperty prop)
+            while (Deserialize(reader) is UEProperty prop)
             {
                 Properties.Add(prop);
                 if (prop is UENoneProperty)

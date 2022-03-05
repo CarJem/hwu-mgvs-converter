@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace GvasFormat.Serialization.UETypes
@@ -11,23 +12,7 @@ namespace GvasFormat.Serialization.UETypes
 
         public abstract void SerializeProp(BinaryWriter writer);
 
-        public void Serialize(BinaryWriter writer)
-        {
-            if (Name == "None" || Name == null)
-            {
-                SerializeProp(writer);
-            }
-            else
-            {
-                writer.WriteUEString(Name);
-                writer.WriteUEString(Type);
-                writer.WriteInt64(ValueLength);
-                SerializeProp(writer);
-            }
-
-        }
-
-        public static UEProperty Read(BinaryReader reader)
+        internal static UEProperty Deserialize(BinaryReader reader)
         {
             if (reader.PeekChar() < 0)
                 return null;
@@ -41,18 +26,21 @@ namespace GvasFormat.Serialization.UETypes
 
             var type = reader.ReadUEString();
             var valueLength = reader.ReadInt64();
-            return UESerializer.Deserialize(name, type, valueLength, reader);
+            return UESerializer.DeserializeProperty(name, type, valueLength, reader);
         }
-
-        public static UEProperty[] Read(BinaryReader reader, int count)
+        public void Serialize(BinaryWriter writer)
         {
-            if (reader.PeekChar() < 0)
-                return null;
-
-            var name = reader.ReadUEString();
-            var type = reader.ReadUEString();
-            var valueLength = reader.ReadInt64();
-            return UESerializer.Deserialize(name, type, valueLength, count, reader);
+            if (Name == "None" || Name == null)
+            {
+                SerializeProp(writer);
+            }
+            else
+            {
+                writer.WriteUEString(Name);
+                writer.WriteUEString(Type);
+                writer.WriteInt64(ValueLength);
+                SerializeProp(writer);
+            }
         }
     }
 }
