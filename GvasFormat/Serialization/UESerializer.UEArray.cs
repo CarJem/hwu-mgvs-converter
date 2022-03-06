@@ -90,7 +90,7 @@ namespace GvasFormat.Serialization
                 var initalPosition = reader.BaseStream.Position;
 
                 var oneInterger = reader.ReadInt32();
-                var noneString = reader.ReadUEString();
+                var noneString = reader.ReadUEString(5, true);
 
                 if (oneInterger != 1 || noneString != "None")
                     reader.BaseStream.Position = initalPosition;
