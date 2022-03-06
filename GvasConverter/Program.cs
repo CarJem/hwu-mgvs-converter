@@ -12,19 +12,30 @@ namespace GvasConverter
     {
         static void Main(string[] args)
         {
-            if (args.Length != 2)
+            if (args.Length < 1 || args.Length >= 3)
             {
                 Console.WriteLine("Usage:");
-                Console.WriteLine("  gvas-converter infile outfile");
+                Console.WriteLine("  gvas-converter infile <outfile>");
                 return;
             }
 
-            var ext = Path.GetExtension(args[0]).ToLower();
+            var inFile = args[0];
+            var outFile = args.Length == 1 ? string.Empty : args[1];
+
+            var ext = Path.GetExtension(inFile).ToLower();
+
+            if (args.Length == 1)
+            {
+                var fileName = Path.GetFileNameWithoutExtension(inFile);
+                if (ext == ".json") outFile = fileName + ".json";
+                else outFile = fileName + ".sav";
+            }
+
             if (ext == ".json")
             {
                 Console.WriteLine("Loading json...");
-                Gvas data = JsonConvert.DeserializeObject<Gvas>(File.ReadAllText(args[0]), new GvasJsonConverter(), new ByteArrayToHexConverter());
-                var stream = File.Open(args[1], FileMode.Create, FileAccess.Write);
+                Gvas data = JsonConvert.DeserializeObject<Gvas>(File.ReadAllText(inFile), new GvasJsonConverter(), new ByteArrayToHexConverter());
+                var stream = File.Open(outFile, FileMode.Create, FileAccess.Write);
                 Console.WriteLine("Converting and saving file...");
                 UESerializer.Write(stream, data);
             }
@@ -32,14 +43,14 @@ namespace GvasConverter
             {
                 Console.WriteLine("Parsing UE4 save file structure...");
                 Gvas save;
-                using (var stream = File.Open(args[0], FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var stream = File.Open(inFile, FileMode.Open, FileAccess.Read, FileShare.Read))
                     save = UESerializer.Read(stream);
 
                 Console.WriteLine("Converting to json...");
                 var json = JsonConvert.SerializeObject(save, Formatting.Indented, new ByteArrayToHexConverter() );
 
                 Console.WriteLine("Saving json...");
-                using (var stream = File.Open(args[1], FileMode.Create, FileAccess.Write, FileShare.Read))
+                using (var stream = File.Open(outFile, FileMode.Create, FileAccess.Write, FileShare.Read))
                 using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))
                     writer.Write(json);
             }
