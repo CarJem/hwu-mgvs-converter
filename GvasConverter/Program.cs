@@ -23,7 +23,7 @@ namespace GvasConverter
             if (ext == ".json")
             {
                 Console.WriteLine("Loading json...");
-                Gvas data = JsonConvert.DeserializeObject<Gvas>(File.ReadAllText(args[0]),new GvasJsonConverter());
+                Gvas data = JsonConvert.DeserializeObject<Gvas>(File.ReadAllText(args[0]), new GvasJsonConverter(), new ByteArrayToHexConverter());
                 var stream = File.Open(args[1], FileMode.Create, FileAccess.Write);
                 Console.WriteLine("Converting and saving file...");
                 UESerializer.Write(stream, data);
@@ -36,7 +36,7 @@ namespace GvasConverter
                     save = UESerializer.Read(stream);
 
                 Console.WriteLine("Converting to json...");
-                var json = JsonConvert.SerializeObject(save, new JsonSerializerSettings{Formatting = Formatting.Indented});
+                var json = JsonConvert.SerializeObject(save, Formatting.Indented, new ByteArrayToHexConverter() );
 
                 Console.WriteLine("Saving json...");
                 using (var stream = File.Open(args[1], FileMode.Create, FileAccess.Write, FileShare.Read))
