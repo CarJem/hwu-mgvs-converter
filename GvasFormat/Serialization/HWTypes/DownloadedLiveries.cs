@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using GvasFormat.Serialization.UETypes;
 
@@ -12,8 +13,6 @@ namespace GvasFormat.Serialization.HWTypes
 
         public int UnknownA { get; set; }
         public int Size { get; set; }
-        public long HeaderUnknownA { get; set; }
-        public int HeaderUnknownB { get; set; }
         public List<HWULiveryRemoteGameData> Items { get; set; } = new List<HWULiveryRemoteGameData>();
 
         public HWUDownloadedLiveries()
@@ -35,6 +34,8 @@ namespace GvasFormat.Serialization.HWTypes
             for (int i = 0; i < Size; i++)
                 Items.Add(new HWULiveryRemoteGameData(reader));
         }
+
+
         public override void SerializeProp(BinaryWriter writer)
         {
             writer.Write(false); //terminator
@@ -43,6 +44,15 @@ namespace GvasFormat.Serialization.HWTypes
 
             for (int i = 0; i < Items.Count; i++)
                 Items[i].SerializeProp(writer);
+        }
+        public static bool CanDeserialize(string arrayType, string name)
+        {
+            return arrayType == OriginalType && name == OriginalName;
+        }
+
+        public static bool CanSerialize(string arrayType, UEProperty[] items, string name)
+        {
+            return arrayType == PropertyType && name == OriginalName && items.Length == 1;
         }
 
         public override void SerializeMap(BinaryWriter writer)

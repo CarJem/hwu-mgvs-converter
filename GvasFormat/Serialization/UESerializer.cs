@@ -15,7 +15,7 @@ namespace GvasFormat.Serialization
             {
                 var header = reader.ReadBytes(Gvas.Header.Length);
                 if (!Gvas.Header.SequenceEqual(header))
-                    throw new FormatException($"Invalid header, expected {Gvas.Header.AsHex()}");
+                    throw new FormatException($"Invalid header, expected {Gvas.Header}");
 
                 var result = new Gvas();
                 result.SaveGameVersion = reader.ReadInt32();
