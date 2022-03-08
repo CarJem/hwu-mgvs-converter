@@ -8,23 +8,26 @@ namespace GvasFormat.Serialization
 {
     public static partial class UESerializer
     {
-        internal static UEProperty[] DeserializeArray(string arrayType, long valueLength, BinaryReader reader)
+        internal static UEProperty[] DeserializeArray(string arrayType, string name, string type, long valueLength, BinaryReader reader)
         {
             List<UEProperty> array;
+
+            if (arrayType == HWUDownloadedLiveries.OriginalType && name == HWUDownloadedLiveries.OriginalName)
+                return new UEProperty[] { new HWUDownloadedLiveries(reader) };
 
             switch (arrayType)
             {
                 case "ByteProperty":
-                    array = DeseralizeByteProperty(arrayType, valueLength, reader);
+                    array = DeseralizeByteProperty(arrayType, name, type, valueLength, reader);
                     break;
                 case "StructProperty":
-                    array = DeseralizeStructProperty(arrayType, valueLength, reader);
+                    array = DeseralizeStructProperty(arrayType, name, type, valueLength, reader);
                     break;
                 case "NameProperty":
-                    array = DeseralizeNameProperty(arrayType, valueLength, reader);
+                    array = DeseralizeNameProperty(arrayType, name, type, valueLength, reader);
                     break;
                 default:
-                    array = DeseralizeGenericProperty(arrayType, valueLength, reader);
+                    array = DeseralizeGenericProperty(arrayType, name, type, valueLength, reader);
                     break;
             }
 
@@ -32,7 +35,7 @@ namespace GvasFormat.Serialization
             return array.ToArray();
         }
 
-        private static List<UEProperty> DeseralizeGenericProperty(string arrayType, long valueLength, BinaryReader reader)
+        private static List<UEProperty> DeseralizeGenericProperty(string arrayType, string name, string type, long valueLength, BinaryReader reader)
         {
             List<UEProperty> array = new List<UEProperty>();
             var terminator = reader.ReadTerminator();
@@ -44,7 +47,7 @@ namespace GvasFormat.Serialization
             }
             return array;
         }
-        private static List<UEProperty> DeseralizeNameProperty(string arrayType, long valueLength, BinaryReader reader)
+        private static List<UEProperty> DeseralizeNameProperty(string arrayType, string name, string type, long valueLength, BinaryReader reader)
         {
             List<UEProperty> array = new List<UEProperty>();
             var terminator = reader.ReadTerminator();
@@ -56,13 +59,15 @@ namespace GvasFormat.Serialization
             }
             return array;
         }
-        private static List<UEProperty> DeseralizeByteProperty(string arrayType, long valueLength, BinaryReader reader)
+
+        private static List<UEProperty> DeseralizeByteProperty(string arrayType, string name, string type, long valueLength, BinaryReader reader)
         {
             List<UEProperty> array = new List<UEProperty>();
             array.Add(DeserializeProperty(null, arrayType, valueLength, reader));
             return array;
         }
-        private static List<UEProperty> DeseralizeStructProperty(string arrayType, long valueLength, BinaryReader reader)
+
+        private static List<UEProperty> DeseralizeStructProperty(string arrayType, string name, string type, long valueLength, BinaryReader reader)
         {
             List<UEProperty> array = new List<UEProperty>();
 
@@ -74,50 +79,49 @@ namespace GvasFormat.Serialization
                 else
                 {
                     var structType = (array[0] as UEStructProperty).StructType;
-                    var item = DeserializeStruct(structType, arrayLength, reader);
+                    var item = DeserializeStruct(name, type, structType, arrayLength, reader);
                     item.Name = array[0].Name;
                     item.Type = array[0].Type;
                     array.Add(item);
 
-                    BlankTest();
+                    if (UEHomelessString.Exists(reader)) array.Add(new UEHomelessString());
                 }
             }
 
             return array;
-
-            void BlankTest()
-            {
-                var initalPosition = reader.BaseStream.Position;
-
-                var oneInterger = reader.ReadInt32();
-                var noneString = reader.ReadUEString(5, true);
-
-                if (oneInterger != 1 || noneString != "None")
-                    reader.BaseStream.Position = initalPosition;
-            }
         }
 
 
-        internal static void SerializeArray(BinaryWriter writer, UEProperty[] Items, string ItemType)
+
+
+        internal static void SerializeArray(BinaryWriter writer, UEProperty[] Items, string Name, string ItemType)
         {
-            switch (ItemType)
+            if (ItemType == HWUDownloadedLiveries.CustomType && Name == HWUDownloadedLiveries.OriginalName && Items.Length == 1)
+                Items[0].SerializeProp(writer);
+            else
             {
-                case "StructProperty":
-                    SeralizeStructProperty(writer, Items, ItemType);
-                    break;
-                case "ByteProperty":
-                    SeralizeByteProperty(writer, Items, ItemType);
-                    break;
-                case "NameProperty":
-                    SeralizeNameProperty(writer, Items, ItemType);
-                    break;
-                default:
-                    SeralizeGenericProperty(writer, Items, ItemType);
-                    break;
+                switch (ItemType)
+                {
+                    case "StructProperty":
+                        SeralizeStructProperty(writer, Items);
+                        break;
+                    case "ByteProperty":
+                        SeralizeByteProperty(writer, Items);
+                        break;
+                    case "NameProperty":
+                        SeralizeNameProperty(writer, Items);
+                        break;
+                    default:
+                        SeralizeGenericProperty(writer, Items);
+                        break;
+                }
             }
+                
+
+
         }
 
-        private static void SeralizeGenericProperty(BinaryWriter writer, UEProperty[] Items, string ItemType)
+        private static void SeralizeGenericProperty(BinaryWriter writer, UEProperty[] Items)
         {
             writer.Write(false); //terminator
             writer.WriteInt32(Items.Length);
@@ -128,7 +132,7 @@ namespace GvasFormat.Serialization
                 else { prop.SerializeProp(writer); }
             }
         }
-        private static void SeralizeNameProperty(BinaryWriter writer, UEProperty[] Items, string ItemType)
+        private static void SeralizeNameProperty(BinaryWriter writer, UEProperty[] Items)
         {
             writer.Write(false); //terminator
             writer.WriteInt32(Items.Length);
@@ -138,7 +142,7 @@ namespace GvasFormat.Serialization
                 prop.SerializeProp(writer, true);
             }
         }
-        private static void SeralizeByteProperty(BinaryWriter writer, UEProperty[] Items, string ItemType)
+        private static void SeralizeByteProperty(BinaryWriter writer, UEProperty[] Items)
         {
             for (int i = 0; i < Items.Length; i++)
             {
@@ -147,7 +151,7 @@ namespace GvasFormat.Serialization
                 else { prop.SerializeProp(writer); }
             }
         }
-        private static void SeralizeStructProperty(BinaryWriter writer, UEProperty[] Items, string ItemType)
+        private static void SeralizeStructProperty(BinaryWriter writer, UEProperty[] Items)
         {
             writer.Write(false); //terminator
             writer.WriteInt32(Items.Length);

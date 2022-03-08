@@ -6,8 +6,13 @@ namespace GvasFormat.Serialization.UETypes
     internal class UEQuaternionStructProperty : UEStructProperty
     {
 
-        public UEQuaternionStructProperty(BinaryReader reader)
+        public UEQuaternionStructProperty(BinaryReader reader, string name, string type, string structType, long valueLength)
         {
+            Name = name;
+            Type = type;
+            StructType = structType;
+            ValueLength = valueLength;
+
             X = reader.ReadSingle();
             Y = reader.ReadSingle();
             I = reader.ReadSingle();

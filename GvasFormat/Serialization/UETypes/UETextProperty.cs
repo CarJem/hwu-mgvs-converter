@@ -11,8 +11,12 @@ namespace GvasFormat.Serialization.UETypes
         private static readonly Encoding Utf8 = new UTF8Encoding(false);
 
         public UETextProperty() { }
-        public UETextProperty(BinaryReader reader, long valueLength)
+        public UETextProperty(BinaryReader reader, string name, string type, long valueLength)
         {
+            Name = name;
+            Type = type;
+            ValueLength = valueLength;
+
             var terminator = reader.ReadByte();
             if (terminator != 0)
                 throw new FormatException($"Offset: 0x{reader.BaseStream.Position - 1:x8}. Expected terminator (0x00), but was (0x{terminator:x2})");
@@ -30,6 +34,10 @@ namespace GvasFormat.Serialization.UETypes
 
             Id = reader.ReadByte().ToString();
             Value = reader.ReadUEString();
+        }
+        public override void SerializeMap(BinaryWriter writer)
+        {
+            throw new NotImplementedException();
         }
 
         public override void SerializeProp(BinaryWriter writer)

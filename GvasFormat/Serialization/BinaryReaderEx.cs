@@ -19,7 +19,7 @@ namespace GvasFormat.Serialization
                 return null;
 
             var length = reader.ReadInt32();
-            if (length == 0)
+            if (length <= 0 || length >= 512)
                 return null;
 
             if (length == 1)
@@ -28,30 +28,37 @@ namespace GvasFormat.Serialization
             var valueBytes = reader.ReadBytes(length);
             return Utf8.GetString(valueBytes, 0, valueBytes.Length - 1);
         }
-        public static string ReadUEString(this BinaryReader reader, long vl, bool ignoreLength = false)
+
+        public static string ReadUEString(this BinaryReader reader, long manualLength)
         {
             if (reader.PeekChar() < 0)
                 return null;
 
-            if (ignoreLength)
-            {
-                var valueBytes = reader.ReadBytes((int)vl - 4);
-                return Utf8.GetString(valueBytes, 0, (int)vl - 4 - 1);
-            }
-            else
-            {
-                var length = reader.ReadInt32();
-                if (length == 0)
-                    return null;
+            var length = reader.ReadInt32();
+            if (length == 0)
+                return null;
 
-                if (length == 1)
-                    return "";
+            if (length == 1)
+                return "";
 
-                var valueBytes = reader.ReadBytes((int)vl - 4);
-                return Utf8.GetString(valueBytes, 0, length - 1);
-            }
+            var valueBytes = reader.ReadBytes((int)manualLength);
+            return Utf8.GetString(valueBytes, 0, (int)manualLength - 1);
+        }
 
+        public static string ReadUEStringProperty(this BinaryReader reader, long vl)
+        {
+            if (reader.PeekChar() < 0)
+                return null;
 
+            var length = reader.ReadInt32();
+            if (length == 0)
+                return null;
+
+            if (length == 1)
+                return "";
+
+            var valueBytes = reader.ReadBytes((int)vl - 4);
+            return Utf8.GetString(valueBytes, 0, length - 1);
         }
         public static byte[] ReadJFIF(this BinaryReader reader)
         {

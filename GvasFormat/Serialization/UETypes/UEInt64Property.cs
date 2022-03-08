@@ -5,17 +5,16 @@ using System.IO;
 namespace GvasFormat.Serialization.UETypes
 {
     [DebuggerDisplay("{Value}", Name = "{Name}")]
-    public sealed class UEIntProperty : UEProperty
+    public sealed class UEInt64Property : UEProperty
     {
-        public UEIntProperty() { }
-        public UEIntProperty(BinaryReader reader, string name, string type, long valueLength)
+        public UEInt64Property() { }
+        public UEInt64Property(BinaryReader reader, string name, string type, long valueLength)
         {
             Name = name;
             Type = type;
             ValueLength = valueLength;
 
-            if (valueLength == -1)
-            {//IntProperty in MapProperty
+            if (valueLength == -1) {//Int64Property in MapProperty
                 Value = reader.ReadInt32();
                 return;
             }
@@ -24,10 +23,10 @@ namespace GvasFormat.Serialization.UETypes
             if (terminator != 0)
                 throw new FormatException($"Offset: 0x{reader.BaseStream.Position - 1:x8}. Expected terminator (0x00), but was (0x{terminator:x2})");
 
-            if (valueLength != sizeof(int))
-                throw new FormatException($"Expected int value of length {sizeof(int)}, but was {valueLength}");
+            if (valueLength != sizeof(Int64))
+                throw new FormatException($"Expected double value of length {sizeof(Int64)}, but was {valueLength}");
 
-            Value = reader.ReadInt32();
+            Value = reader.ReadInt64();
         }
         public override void SerializeMap(BinaryWriter writer)
         {
@@ -38,9 +37,9 @@ namespace GvasFormat.Serialization.UETypes
         {
             if (ValueLength != -1)
                 writer.Write(false); //terminator
-            writer.WriteInt32(Value);
+            writer.WriteInt64(Value);
         }
 
-        public int Value;
+        public Int64 Value;
     }
 }

@@ -11,13 +11,15 @@ namespace GvasFormat.Serialization.UETypes
         public long ValueLength;
 
         public abstract void SerializeProp(BinaryWriter writer);
+        public abstract void SerializeMap(BinaryWriter writer);
 
         internal static UEProperty Deserialize(BinaryReader reader)
         {
             if (reader.PeekChar() < 0)
-                return null;
+                return null;    
 
             var name = reader.ReadUEString();
+
             if (name == null)
                 return null;
 
@@ -25,12 +27,16 @@ namespace GvasFormat.Serialization.UETypes
                 return new UENoneProperty { Name = name };
 
             var type = reader.ReadUEString();
+
+            if (name == string.Empty && type == "None")
+                return new UEHomelessString();
+
             var valueLength = reader.ReadInt64();
             return UESerializer.DeserializeProperty(name, type, valueLength, reader);
         }
         public void Serialize(BinaryWriter writer)
         {
-            if (Name == "None" || Name == null)
+            if (Name == "None" || Name == UEHomelessString.PropertyName || Name == null || Type == HWTypes.HWUDownloadedLiveries.CustomType)
             {
                 SerializeProp(writer);
             }

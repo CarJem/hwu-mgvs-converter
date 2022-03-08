@@ -9,10 +9,18 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UEObjectProperty : UEProperty
     {
         public UEObjectProperty() { }
-        public UEObjectProperty(BinaryReader reader, long valueLength)
+        public UEObjectProperty(BinaryReader reader, string name, string type, long valueLength)
         {
+            Name = name;
+            Type = type;
+            ValueLength = valueLength;
+
             var terminator = reader.ReadByte();
             Value = reader.ReadBytes((int)valueLength);
+        }
+        public override void SerializeMap(BinaryWriter writer)
+        {
+            throw new NotImplementedException();
         }
 
         public override void SerializeProp(BinaryWriter writer)

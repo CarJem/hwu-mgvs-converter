@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace GvasFormat.Serialization.UETypes
@@ -8,6 +9,10 @@ namespace GvasFormat.Serialization.UETypes
     {
 
         public UENoneProperty() { Name = "None"; }
+        public override void SerializeMap(BinaryWriter writer)
+        {
+            throw new NotImplementedException();
+        }
 
         public override void SerializeProp(BinaryWriter writer)
         {

@@ -24,6 +24,10 @@ namespace GvasConverter
 
             switch (type)
             {
+                case "DoubleProperty":
+                    return jo.ToObject<UEDoubleProperty>(serializer);
+                case "Int64Property":
+                    return jo.ToObject<UEInt64Property>(serializer);
                 case "BoolProperty":
                     return jo.ToObject<UEBoolProperty>(serializer);
                 case "IntProperty":
@@ -52,8 +56,11 @@ namespace GvasConverter
                     return jo.ToObject<UESetProperty>(serializer);
                 case "ByteProperty":
                     return jo.ToObject<UEByteProperty>(serializer);
+                case HWUDownloadedLiveries.CustomType:
+                    return jo.ToObject<HWUDownloadedLiveries>(serializer);
                 default:
                     if (name == "None") return jo.ToObject<UENoneProperty>(serializer);
+                    else if (name == "Blank") return jo.ToObject<UEHomelessString>(serializer);
                     else throw new FormatException($"Unknown value type '{type}'");
             }
 

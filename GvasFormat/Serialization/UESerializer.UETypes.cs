@@ -15,90 +15,92 @@ namespace GvasFormat.Serialization
             switch (type)
             {
                 case "BoolProperty":
-                    result = new UEBoolProperty(reader, valueLength);
+                    result = new UEBoolProperty(reader, name, type, valueLength);
                     break;
                 case "IntProperty":
-                    result = new UEIntProperty(reader, valueLength);
+                    result = new UEIntProperty(reader, name, type, valueLength);
+                    break;
+                case "Int64Property":
+                    result = new UEInt64Property(reader, name, type, valueLength);
+                    break;
+                case "DoubleProperty":
+                    result = new UEDoubleProperty(reader, name, type, valueLength);
                     break;
                 case "FloatProperty":
-                    result = new UEFloatProperty(reader, valueLength);
+                    result = new UEFloatProperty(reader, name, type, valueLength);
                     break;
                 case "NameProperty":
-                    result = new UENameProperty(reader, valueLength);
+                    result = new UENameProperty(reader, name, type, valueLength);
                     break;
                 case "StrProperty":
-                    result = new UEStringProperty(reader, valueLength);
+                    result = new UEStringProperty(reader, name, type, valueLength);
                     break;
                 case "SoftObjectProperty":
-                    result = new UEObjectProperty(reader, valueLength);
+                    result = new UEObjectProperty(reader, name, type, valueLength);
                     break;
                 case "ObjectProperty":
-                    result = new UEObjectProperty(reader, valueLength);
+                    result = new UEObjectProperty(reader, name, type, valueLength);
                     break;
                 case "TextProperty":
-                    result = new UETextProperty(reader, valueLength);
+                    result = new UETextProperty(reader, name, type, valueLength);
                     break;
                 case "EnumProperty":
-                    result = new UEEnumProperty(reader, valueLength);
+                    result = new UEEnumProperty(reader, name, type, valueLength);
                     break;
                 case "StructProperty":
-                    result = UEStructProperty.Read(reader, valueLength);
+                    result = UEStructProperty.Read(reader, name, type, valueLength);
                     break;
                 case "ArrayProperty":
-                    result = new UEArrayProperty(reader, valueLength);
+                    result = new UEArrayProperty(reader, name, type, valueLength);
                     break;
                 case "MapProperty":
-                    result = new UEMapProperty(reader, valueLength);
+                    result = new UEMapProperty(reader, name, type, valueLength);
                     break;
                 case "SetProperty":
-                    result = new UESetProperty(reader, valueLength);
+                    result = new UESetProperty(reader, name, type, valueLength);
                     break;
                 case "ByteProperty":
-                    result = UEByteProperty.Read(reader, valueLength);
+                    result = UEByteProperty.Read(reader, name, type, valueLength);
                     break;
                 default:
                     throw new FormatException($"Offset: 0x{itemOffset:x8}. Unknown value type '{type}' of item '{name}'");
             }
-            result.Name = name;
-            result.Type = type;
-            result.ValueLength = valueLength;
             return result;
         }
-        internal static UEStructProperty DeserializeStruct(string type, long valueLength, BinaryReader reader)
+
+        internal static UEStructProperty DeserializeStruct(string name, string type, string structType, long valueLength, BinaryReader reader)
         {
             UEStructProperty result;
-            switch (type)
+            switch (structType)
             {
                 case "DateTime":
-                    result = new UEDateTimeStructProperty(reader);
+                    result = new UEDateTimeStructProperty(reader, name, type, structType, valueLength);
                     break;
                 case "Guid":
-                    result = new UEGuidStructProperty(reader);
+                    result = new UEGuidStructProperty(reader, name, type, structType, valueLength);
                     break;
                 case "Vector":
-                    result = new UEVectorStructProperty(reader);
+                    result = new UEVectorStructProperty(reader, name, type, structType, valueLength);
                     break;
                 case "Rotator":
-                    result = new UEVectorStructProperty(reader);
+                    result = new UEVectorStructProperty(reader, name, type, structType, valueLength);
                     break;
                 case "LinearColor":
-                    result = new UELinearColorStructProperty(reader);
+                    result = new UELinearColorStructProperty(reader, name, type, structType, valueLength);
                     break;
                 case "Transform":
-                    result = new UETransformStructProperty(reader);
+                    result = new UETransformStructProperty(reader, name, type, structType, valueLength);
                     break;
                 case "Quat":
-                    result = new UEQuaternionStructProperty(reader);
+                    result = new UEQuaternionStructProperty(reader, name, type, structType, valueLength);
                     break;
                 case "VehicleEditorProject":
-                    result = new HWUVehicleEditorProject(reader);
+                    result = new HWUVehicleEditorProject(reader, name, type, structType, valueLength);
                     break;
                 default:
-                    result = new UEGenericStructProperty(reader);
+                    result = new UEGenericStructProperty(reader, name, type, structType, valueLength);
                     break;
             }
-            result.StructType = type;
-            result.ValueLength = valueLength;
             return result;
         }
     }

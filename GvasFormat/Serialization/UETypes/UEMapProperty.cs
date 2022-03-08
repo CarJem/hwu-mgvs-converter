@@ -11,8 +11,12 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UEMapProperty : UEProperty
     {
         public UEMapProperty() { }
-        public UEMapProperty(BinaryReader reader, long valueLength)
+        public UEMapProperty(BinaryReader reader, string name, string type, long valueLength)
         {
+            Name = name;
+            Type = type;
+            ValueLength = valueLength;
+
             KeyType = reader.ReadUEString();
             ValueType = reader.ReadUEString();
             var unknown = reader.ReadBytes(5);
@@ -27,15 +31,14 @@ namespace GvasFormat.Serialization.UETypes
                     key = Deserialize(reader);
                 else
                     key = UESerializer.DeserializeProperty(null, KeyType, -1, reader);
+
                 var values = new List<UEProperty>();
-                do
-                {
-                    if (ValueType == "StructProperty")
-                        value = Deserialize(reader);
-                    else
-                        value = UESerializer.DeserializeProperty(null, ValueType, -1, reader);
-                    values.Add(value);
-                } while (!(value is UENoneProperty));
+                if (ValueType == "StructProperty")
+                    value = Deserialize(reader);
+                else
+                    value = UESerializer.DeserializeProperty(null, ValueType, -1, reader);
+                values.Add(value);
+                //do {} while (!(value is UENoneProperty));
                 Map.Add(new UEKeyValuePair{Key = key, Values = values});
             }
             if (count == 0)
@@ -44,6 +47,11 @@ namespace GvasFormat.Serialization.UETypes
                 Deserialize(reader);
             }
         }
+        public override void SerializeMap(BinaryWriter writer)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void SerializeProp(BinaryWriter writer)
         {
             writer.WriteUEString(KeyType);
@@ -54,11 +62,11 @@ namespace GvasFormat.Serialization.UETypes
 
             foreach (UEKeyValuePair p in Map)
             {
-                p.Key.Serialize(writer);
+                p.Key.SerializeMap(writer);
 
                 foreach (UEProperty v in p.Values)
                 {
-                    v.Serialize(writer);
+                    v.SerializeMap(writer);
                 }
             }
             if (Map.Count == 0)

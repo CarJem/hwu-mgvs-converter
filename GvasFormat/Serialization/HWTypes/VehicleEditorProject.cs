@@ -17,15 +17,22 @@ namespace GvasFormat.Serialization.HWTypes
         public int TagCount { get; set; }
         public List<string> Tags { get; set; } = new List<string>();
 
-        public Int64 UnknownA { get; set; }
-        public Int64 UnknownB { get; set; }
-        public Int64 UnknownC { get; set; }
-        public Int64 UnknownD { get; set; }
+        public Int64 UnknownUUID { get; set; }
+        public byte[] Unknown_00 { get; set; }
+        public byte Unknown_04 { get; set; }
+        public byte Unknown_05 { get; set; }
+        public byte SomeIterable { get; set; }
+        public byte Unknown_07 { get; set; }
+        public byte[] Unknown_08 { get; set; }
+        public byte[] Unknown_10 { get; set; }
 
         public Int64 DataSize { get; set; }
-        public Int64 UnknownE { get; set; }
-        public Int64 DataSizeClone { get; set; }
-        public Int64 UnknownF { get; set; }
+        public Int64 Unknown_18 { get; set; }
+
+        public byte[] Unknown_20 { get; set; } = new byte[0];
+
+        public Int64 Unknown_LongA { get; set; }
+        public Int64 Unknown_LongB { get; set; }
 
         public byte[] Data { get; set; }
 
@@ -35,13 +42,17 @@ namespace GvasFormat.Serialization.HWTypes
         public byte[] JFIFData { get; set; }
 
         public string Vehicle { get; set; }
-        public Int32 UnknownG { get; set; }
 
         public List<UEProperty> Properties { get; set; } = new List<UEProperty>();
 
         public HWUVehicleEditorProject() { }
-        public HWUVehicleEditorProject(BinaryReader reader)
+        public HWUVehicleEditorProject(BinaryReader reader, string name, string type, string structType, long valueLength)
         {
+            Name = name;
+            Type = type;
+            StructType = structType;
+            ValueLength = valueLength;
+
             Guid = new Guid(reader.ReadBytes(16));
             LiveryName = reader.ReadUEString();
 
@@ -50,18 +61,28 @@ namespace GvasFormat.Serialization.HWTypes
             for (int i = 0; i < TagCount; i++)
                 Tags.Add(reader.ReadUEString());
 
-            UnknownA = reader.ReadInt64();
-            UnknownB = reader.ReadInt64();
-            UnknownC = reader.ReadInt64();
-            UnknownD = reader.ReadInt64();
+  
+            UnknownUUID = reader.ReadInt64();
+            Unknown_00 = reader.ReadBytes(4);
+            Unknown_04 = reader.ReadByte();
+            Unknown_05 = reader.ReadByte();
+            SomeIterable = reader.ReadByte();
+            Unknown_07 = reader.ReadByte();
+            Unknown_08 = reader.ReadBytes(8);
+            Unknown_10 = reader.ReadBytes(8);
 
             DataSize = reader.ReadInt64();
-            UnknownE = reader.ReadInt64();
-            DataSizeClone = reader.ReadInt64();
-            UnknownF = reader.ReadInt64();
+            Unknown_18 = reader.ReadInt64();
+
+            int arraySize = SomeIterable - (int)SomeIterable % 2;
+            if (SomeIterable != 0) Unknown_20 = reader.ReadBytes(8 * arraySize);
+
+            Unknown_LongA = reader.ReadInt64();
+            Unknown_LongB = reader.ReadInt64();
+
             Data = reader.ReadBytes((int)DataSize);
             Material = reader.ReadUEString();
-
+            
             JFIFJunk = reader.ReadBytes(25);
             JFIFData = reader.ReadJFIF();
 
@@ -81,15 +102,23 @@ namespace GvasFormat.Serialization.HWTypes
             for (int i = 0; i < TagCount; i++)
                 writer.WriteUEString(Tags[i]);
 
-            writer.WriteInt64(UnknownA);
-            writer.WriteInt64(UnknownB);
-            writer.WriteInt64(UnknownC);
-            writer.WriteInt64(UnknownD);
+            writer.WriteInt64(UnknownUUID);
+            writer.Write(Unknown_00);
+            writer.Write(Unknown_04);
+            writer.Write(Unknown_05);
+            writer.Write(SomeIterable);
+            writer.Write(Unknown_07);
+            writer.Write(Unknown_08);
+            writer.Write(Unknown_10);
 
             writer.WriteInt64(DataSize);
-            writer.WriteInt64(UnknownE);
-            writer.WriteInt64(DataSizeClone);
-            writer.WriteInt64(UnknownF);
+            writer.WriteInt64(Unknown_18);
+
+            if (SomeIterable != 0) writer.Write(Unknown_20);
+
+            writer.WriteInt64(Unknown_LongA);
+            writer.WriteInt64(Unknown_LongB);
+
             writer.Write(Data);
             writer.WriteUEString(Material);
 

@@ -8,9 +8,10 @@ namespace GvasFormat.Serialization.UETypes
     {
         public UEStructProperty() { }
 
-        public static UEStructProperty Read(BinaryReader reader, long valueLength)
+        public static UEStructProperty Read(BinaryReader reader, string name, string type, long valueLength)
         {
-            var type = reader.ReadUEString();
+
+            var structType = reader.ReadUEString();
 
             var id = new Guid(reader.ReadBytes(16));
             if (id != Guid.Empty)
@@ -20,12 +21,16 @@ namespace GvasFormat.Serialization.UETypes
             if (terminator != 0)
                 throw new FormatException($"Offset: 0x{reader.BaseStream.Position - 1:x8}. Expected terminator (0x00), but was (0x{terminator:x2})");
 
-            var result = UESerializer.DeserializeStruct(type, valueLength, reader);
-            result.ValueLength = valueLength;
+            var result = UESerializer.DeserializeStruct(name, type, structType, valueLength, reader);
             return result;
         }
 
         public abstract void SerializeStructProp(BinaryWriter writer);
+
+        public override void SerializeMap(BinaryWriter writer)
+        {
+            throw new NotImplementedException();
+        }
 
         public override void SerializeProp(BinaryWriter writer)
         {

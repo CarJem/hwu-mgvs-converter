@@ -8,8 +8,13 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UEVectorStructProperty : UEStructProperty
     {
         public UEVectorStructProperty() { }
-        public UEVectorStructProperty(BinaryReader reader)
+        public UEVectorStructProperty(BinaryReader reader, string name, string type, string structType, long valueLength)
         {
+            Name = name;
+            Type = type;
+            StructType = structType;
+            ValueLength = valueLength;
+
             X = reader.ReadSingle();
             Y = reader.ReadSingle();
             Z = reader.ReadSingle();

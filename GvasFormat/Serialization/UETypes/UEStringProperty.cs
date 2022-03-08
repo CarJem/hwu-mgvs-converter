@@ -11,19 +11,27 @@ namespace GvasFormat.Serialization.UETypes
         private static readonly Encoding Utf8 = new UTF8Encoding(false);
 
         public UEStringProperty() { }
-        public UEStringProperty(BinaryReader reader, long valueLength)
+        public UEStringProperty(BinaryReader reader, string name, string type, long valueLength)
         {
+            Name = name;
+            Type = type;
+            ValueLength = valueLength;
+
             if (valueLength > -1)
             {
                 var terminator = reader.ReadByte();
                 if (terminator != 0)
                     throw new FormatException($"Offset: 0x{reader.BaseStream.Position - 1:x8}. Expected terminator (0x00), but was (0x{terminator:x2})");
-                Value = reader.ReadUEString(valueLength);
+                Value = reader.ReadUEStringProperty(valueLength);
             } else
             {
                 Value = reader.ReadUEString();
             }
 
+        }
+        public override void SerializeMap(BinaryWriter writer)
+        {
+            writer.WriteUEString(Value, ValueLength);
         }
 
         public override void SerializeProp(BinaryWriter writer)
