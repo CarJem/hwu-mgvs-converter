@@ -8,12 +8,8 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UEBoolProperty : UEProperty
     {
         public UEBoolProperty() { }
-        public UEBoolProperty(BinaryReader reader, string name, string type, long valueLength)
+        public UEBoolProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
-            Name = name;
-            Type = type;
-            ValueLength = valueLength;
-
             if (valueLength != 0)
                 throw new FormatException($"Offset: 0x{reader.BaseStream.Position - 1:x8}. Expected bool value length 0, but was {valueLength}");
 

@@ -11,12 +11,8 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UEMapProperty : UEProperty
     {
         public UEMapProperty() { }
-        public UEMapProperty(BinaryReader reader, string name, string type, long valueLength)
+        public UEMapProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
-            Name = name;
-            Type = type;
-            ValueLength = valueLength;
-
             KeyType = reader.ReadUEString();
             ValueType = reader.ReadUEString();
             var unknown = reader.ReadBytes(5);

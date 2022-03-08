@@ -7,17 +7,18 @@ namespace GvasFormat.Serialization.UETypes
     [DebuggerDisplay("", Name = "{Name}")]
     public sealed class UENoneProperty : UEProperty
     {
+        public const string PropertyName = "None";
+        public UENoneProperty() { Name = PropertyName; }
 
-        public UENoneProperty() { Name = "None"; }
+
         public override void SerializeMap(BinaryWriter writer)
         {
             throw new NotImplementedException();
         }
-
         public override void SerializeProp(BinaryWriter writer)
         {
             long pos = writer.BaseStream.Position;
-            writer.WriteUEString("None");
+            writer.WriteUEString(UENoneProperty.PropertyName);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace GvasFormat.Serialization
             List<UEProperty> array;
 
             if (arrayType == HWUDownloadedLiveries.OriginalType && name == HWUDownloadedLiveries.OriginalName)
-                return new UEProperty[] { new HWUDownloadedLiveries(reader) };
+                return new UEProperty[] { new HWUDownloadedLiveries(reader, name) };
 
             switch (arrayType)
             {
@@ -96,7 +96,7 @@ namespace GvasFormat.Serialization
 
         internal static void SerializeArray(BinaryWriter writer, UEProperty[] Items, string Name, string ItemType)
         {
-            if (ItemType == HWUDownloadedLiveries.CustomType && Name == HWUDownloadedLiveries.OriginalName && Items.Length == 1)
+            if (ItemType == HWUDownloadedLiveries.PropertyType && Name == HWUDownloadedLiveries.OriginalName && Items.Length == 1)
                 Items[0].SerializeProp(writer);
             else
             {

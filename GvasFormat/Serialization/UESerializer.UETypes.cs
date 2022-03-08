@@ -47,9 +47,6 @@ namespace GvasFormat.Serialization
                 case "EnumProperty":
                     result = new UEEnumProperty(reader, name, type, valueLength);
                     break;
-                case "StructProperty":
-                    result = UEStructProperty.Read(reader, name, type, valueLength);
-                    break;
                 case "ArrayProperty":
                     result = new UEArrayProperty(reader, name, type, valueLength);
                     break;
@@ -60,7 +57,10 @@ namespace GvasFormat.Serialization
                     result = new UESetProperty(reader, name, type, valueLength);
                     break;
                 case "ByteProperty":
-                    result = UEByteProperty.Read(reader, name, type, valueLength);
+                    result = new UEByteProperty(reader, name, type, valueLength);
+                    break;
+                case "StructProperty":
+                    result = UEStructProperty.Read(reader, name, type, valueLength);
                     break;
                 default:
                     throw new FormatException($"Offset: 0x{itemOffset:x8}. Unknown value type '{type}' of item '{name}'");

@@ -11,13 +11,8 @@ namespace GvasFormat.Serialization.UETypes
     {
         public UEDateTimeStructProperty() { }
 
-        public UEDateTimeStructProperty(BinaryReader reader, string name, string type, string structType, long valueLength)
+        public UEDateTimeStructProperty(BinaryReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
         {
-            Name = name;
-            Type = type;
-            StructType = structType;
-            ValueLength = valueLength;
-
             Value = DateTime.FromBinary(reader.ReadInt64());
         }
 

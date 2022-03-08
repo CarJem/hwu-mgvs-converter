@@ -35,12 +35,12 @@ namespace GvasFormat.Serialization.HWTypes
                 throw new FormatException($"Offset: 0x{itemOffset:x8}. Unknown value type '{Type}'");
 
             UEProperty prop;
-            while ((prop = UEProperty.Deserialize(reader)).Name != "None")
+            while ((prop = UEProperty.Deserialize(reader)).Name != UENoneProperty.PropertyName)
             {
                 Properties.Add(prop);
                 if (prop is HWUVehicleEditorProject)
                 {
-                    if (UEHomelessString.Exists(reader, "None"))
+                    if (UEHomelessString.Exists(reader, UENoneProperty.PropertyName))
                         Properties.Add(new UEHomelessString());
 
                     if (UEHomelessString.Exists(reader, "Contest_01"))
@@ -52,7 +52,7 @@ namespace GvasFormat.Serialization.HWTypes
 
             Project = new HWUVehicleEditorProject(reader, "", "StructProperty", "VehicleEditorProject", -1);
 
-            if (UEHomelessString.Exists(reader, "None"))
+            if (UEHomelessString.Exists(reader, UENoneProperty.PropertyName))
                 PostProperties.Add(new UEHomelessString());
 
             if (UEHomelessString.Exists(reader, "Contest_01"))

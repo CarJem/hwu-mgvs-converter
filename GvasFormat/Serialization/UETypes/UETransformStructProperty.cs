@@ -11,13 +11,8 @@ namespace GvasFormat.Serialization.UETypes
 
         public UETransformStructProperty() { }
 
-        public UETransformStructProperty(BinaryReader reader, string name, string type, string structType, long valueLength)
+        public UETransformStructProperty(BinaryReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
         {
-            Name = name;
-            Type = type;
-            StructType = structType;
-            ValueLength = valueLength;
-
             while (Deserialize(reader) is UEProperty prop)
             {
                 Transform.Add(prop);

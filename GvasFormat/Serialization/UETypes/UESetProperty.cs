@@ -11,12 +11,8 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UESetProperty : UEProperty
     {
         public UESetProperty() { }
-        public UESetProperty(BinaryReader reader, string name, string type, long valueLength)
+        public UESetProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
-            Name = name;
-            Type = type;
-            ValueLength = valueLength;
-
             SetLength = reader.ReadInt32();
             var terminator = reader.ReadByte();
             ValueType = reader.ReadUEString();

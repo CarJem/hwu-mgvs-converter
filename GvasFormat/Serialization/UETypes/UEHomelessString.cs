@@ -12,7 +12,7 @@ namespace GvasFormat.Serialization.UETypes
         public UEHomelessString()
         {
             Name = PropertyName;
-            LegitName = "None";
+            LegitName = UENoneProperty.PropertyName;
         }
 
         public UEHomelessString(string name)
@@ -32,7 +32,7 @@ namespace GvasFormat.Serialization.UETypes
             throw new NotImplementedException();
         }
 
-        public static bool Exists(BinaryReader reader, string desiredName = "None")
+        public static bool Exists(BinaryReader reader, string desiredName = UENoneProperty.PropertyName)
         {
             var initalPosition = reader.BaseStream.Position;
 

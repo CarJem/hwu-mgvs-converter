@@ -1,4 +1,5 @@
-﻿using GvasFormat.Utils;
+﻿using GvasFormat.Serialization.UETypes;
+using GvasFormat.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -90,7 +91,7 @@ namespace GvasFormat.Serialization
 
         public static void WriteUENoneProperty(this BinaryWriter writer)
         {
-            writer.WriteUEString("None");
+            writer.WriteUEString(UENoneProperty.PropertyName);
         }
         public static void WriteUEString(this BinaryWriter writer, string value)
         {

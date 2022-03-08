@@ -8,12 +8,8 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UEDoubleProperty : UEProperty
     {
         public UEDoubleProperty() { }
-        public UEDoubleProperty(BinaryReader reader, string name, string type, long valueLength)
+        public UEDoubleProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
-            Name = name;
-            Type = type;
-            ValueLength = valueLength;
-
             if (valueLength == -1)
             {//DoubleProperty in MapProperty
                 Value = reader.ReadInt32();

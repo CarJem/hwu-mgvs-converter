@@ -9,15 +9,12 @@ namespace GvasFormat.Serialization.UETypes
     [DebuggerDisplay("{Value}", Name = "{Name}")]
     public sealed class UEByteProperty : UEProperty
     {
-        private static readonly Encoding Utf8 = new UTF8Encoding(false);
-
         public UEByteProperty() { }
-        public static UEByteProperty Read(BinaryReader reader, string name, string type, long valueLength)
+        public UEByteProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
             var terminator = reader.ReadTerminator();
             var arrayLength = reader.ReadInt32();
-            var bytes = reader.ReadBytes(arrayLength);
-            return new UEByteProperty {Value = bytes, Name = name, Type = type, ValueLength = valueLength };
+            Value = reader.ReadBytes(arrayLength);
         }
         public override void SerializeMap(BinaryWriter writer)
         {

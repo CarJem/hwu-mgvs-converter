@@ -8,12 +8,8 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UEArrayProperty : UEProperty
     {
         public UEArrayProperty() { }
-        public UEArrayProperty(BinaryReader reader, string name, string type, long valueLength)
+        public UEArrayProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
-            Name = name;
-            Type = type;
-            ValueLength = valueLength;
-
             ItemType = reader.ReadUEString();
             Items = UESerializer.DeserializeArray(ItemType, name, type, valueLength, reader);
         }

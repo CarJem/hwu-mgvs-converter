@@ -6,7 +6,7 @@ namespace GvasFormat.Serialization.HWTypes
 {
     public class HWUDownloadedLiveries : UEProperty
     {
-        public const string CustomType = "HWUDownloadedLiveries";
+        public const string PropertyType = "HWUDownloadedLiveries";
         public const string OriginalType = "ByteProperty";
         public const string OriginalName = "DownloadedLiveries";
 
@@ -18,14 +18,14 @@ namespace GvasFormat.Serialization.HWTypes
 
         public HWUDownloadedLiveries()
         {
-            Type = CustomType;
+            Type = PropertyType;
             Name = OriginalName;
         }
 
-        public HWUDownloadedLiveries(BinaryReader reader)
+        public HWUDownloadedLiveries(BinaryReader reader, string name)
         {
-            Type = CustomType;
-            Name = OriginalName;
+            Type = PropertyType;
+            Name = name;
 
             reader.ReadTerminator();
             UnknownA = reader.ReadInt32();

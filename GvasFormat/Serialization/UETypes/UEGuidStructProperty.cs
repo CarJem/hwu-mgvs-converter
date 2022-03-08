@@ -9,13 +9,8 @@ namespace GvasFormat.Serialization.UETypes
     {
         public UEGuidStructProperty() { }
 
-        public UEGuidStructProperty(BinaryReader reader, string name, string type, string structType, long valueLength)
+        public UEGuidStructProperty(BinaryReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
         {
-            Name = name;
-            Type = type;
-            StructType = structType;
-            ValueLength = valueLength;
-
             Value = new Guid(reader.ReadBytes(16));
         }
 

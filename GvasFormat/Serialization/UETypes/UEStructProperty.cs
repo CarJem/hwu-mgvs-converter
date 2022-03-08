@@ -7,10 +7,13 @@ namespace GvasFormat.Serialization.UETypes
     public abstract class UEStructProperty : UEProperty
     {
         public UEStructProperty() { }
+        public UEStructProperty(string name, string type, string structType, long valueLength) : base(name, type, valueLength) 
+        {
+            StructType = structType;
+        }
 
         public static UEStructProperty Read(BinaryReader reader, string name, string type, long valueLength)
         {
-
             var structType = reader.ReadUEString();
 
             var id = new Guid(reader.ReadBytes(16));

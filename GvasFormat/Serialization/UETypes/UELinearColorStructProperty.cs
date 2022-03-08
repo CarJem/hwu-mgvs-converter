@@ -8,13 +8,8 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UELinearColorStructProperty : UEStructProperty
     {
         public UELinearColorStructProperty() { }
-        public UELinearColorStructProperty(BinaryReader reader, string name, string type, string structType, long valueLength)
+        public UELinearColorStructProperty(BinaryReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
         {
-            Name = name;
-            Type = type;
-            StructType = structType;
-            ValueLength = valueLength;
-
             R = reader.ReadSingle();
             G = reader.ReadSingle();
             B = reader.ReadSingle();

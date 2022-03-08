@@ -46,13 +46,8 @@ namespace GvasFormat.Serialization.HWTypes
         public List<UEProperty> Properties { get; set; } = new List<UEProperty>();
 
         public HWUVehicleEditorProject() { }
-        public HWUVehicleEditorProject(BinaryReader reader, string name, string type, string structType, long valueLength)
+        public HWUVehicleEditorProject(BinaryReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
         {
-            Name = name;
-            Type = type;
-            StructType = structType;
-            ValueLength = valueLength;
-
             Guid = new Guid(reader.ReadBytes(16));
             LiveryName = reader.ReadUEString();
 
@@ -87,7 +82,7 @@ namespace GvasFormat.Serialization.HWTypes
             JFIFData = reader.ReadJFIF();
 
             UEProperty prop;
-            while ((prop = Deserialize(reader)).Name != "None")
+            while ((prop = Deserialize(reader)).Name != UENoneProperty.PropertyName)
                 Properties.Add(prop);
 
             Vehicle = reader.ReadUEString();

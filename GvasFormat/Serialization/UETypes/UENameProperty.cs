@@ -11,12 +11,8 @@ namespace GvasFormat.Serialization.UETypes
         private static readonly Encoding Utf8 = new UTF8Encoding(false);
 
         public UENameProperty() { }
-        public UENameProperty(BinaryReader reader, string name, string type, long valueLength)
+        public UENameProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
-            Name = name;
-            Type = type;
-            ValueLength = valueLength;
-
             if (valueLength > -1)
             {
                 var terminator = reader.ReadByte();
