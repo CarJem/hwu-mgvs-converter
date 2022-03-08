@@ -15,26 +15,35 @@ namespace GvasFormat.Serialization.UETypes
         {
             EnumType = reader.ReadUEString();
 
-            var terminator = reader.ReadByte();
-            if (terminator != 0)
-                throw new FormatException($"Offset: 0x{reader.BaseStream.Position - 1:x8}. Expected terminator (0x00), but was (0x{terminator:x2})");
-
-            // valueLength starts here
-
-            Value = reader.ReadUEString();
-        }
-        public override void SerializeMap(BinaryWriter writer)
-        {
-            throw new NotImplementedException();
+            if (EnumType.Contains("::"))
+            {
+                IsCompactName = true;
+            }
+            else
+            {
+                IsCompactName = false;
+                reader.ReadTerminator();
+                Value = reader.ReadUEString();
+            }
         }
 
         public override void SerializeProp(BinaryWriter writer)
         {
-            writer.WriteUEString(EnumType);
-            writer.Write(false); //terminator
-            writer.WriteUEString(Value);
+            if (IsCompactName)
+            {
+                writer.WriteUEString(EnumType);
+            }
+            else
+            {
+                writer.WriteUEString(EnumType);
+                writer.Write(false); //terminator
+                writer.WriteUEString(Value);
+            }
+
+
         }
 
+        public bool IsCompactName;
         public string EnumType;
         public string Value;
     }

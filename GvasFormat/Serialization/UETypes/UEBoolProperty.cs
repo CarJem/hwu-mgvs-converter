@@ -21,10 +21,6 @@ namespace GvasFormat.Serialization.UETypes
             else
                 throw new InvalidOperationException($"Offset: 0x{reader.BaseStream.Position - 1:x8}. Expected bool value, but was {val}");
         }
-        public override void SerializeMap(BinaryWriter writer)
-        {
-            throw new NotImplementedException();
-        }
 
         public override void SerializeProp(BinaryWriter writer)
         {

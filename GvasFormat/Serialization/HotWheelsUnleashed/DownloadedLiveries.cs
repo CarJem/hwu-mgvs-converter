@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using GvasFormat.Serialization.UETypes;
 
-namespace GvasFormat.Serialization.HWTypes
+namespace GvasFormat.Serialization.HotWheelsUnleashed
 {
     public class HWUDownloadedLiveries : UEProperty
     {
@@ -53,11 +53,6 @@ namespace GvasFormat.Serialization.HWTypes
         public static bool CanSerialize(string arrayType, UEProperty[] items, string name)
         {
             return arrayType == PropertyType && name == OriginalName && items.Length == 1;
-        }
-
-        public override void SerializeMap(BinaryWriter writer)
-        {
-            throw new System.NotImplementedException();
         }
     }
 

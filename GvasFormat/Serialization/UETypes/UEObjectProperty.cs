@@ -14,10 +14,6 @@ namespace GvasFormat.Serialization.UETypes
             var terminator = reader.ReadByte();
             Value = reader.ReadBytes((int)valueLength);
         }
-        public override void SerializeMap(BinaryWriter writer)
-        {
-            throw new NotImplementedException();
-        }
 
         public override void SerializeProp(BinaryWriter writer)
         {

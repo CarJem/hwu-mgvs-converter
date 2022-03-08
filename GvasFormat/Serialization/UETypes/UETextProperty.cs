@@ -31,10 +31,6 @@ namespace GvasFormat.Serialization.UETypes
             Id = reader.ReadByte().ToString();
             Value = reader.ReadUEString();
         }
-        public override void SerializeMap(BinaryWriter writer)
-        {
-            throw new NotImplementedException();
-        }
 
         public override void SerializeProp(BinaryWriter writer)
         {

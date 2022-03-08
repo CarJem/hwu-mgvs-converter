@@ -1,5 +1,5 @@
 ﻿using GvasFormat;
-using GvasFormat.Serialization.HWTypes;
+using GvasFormat.Serialization.HotWheelsUnleashed;
 using GvasFormat.Serialization.UETypes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -85,6 +85,8 @@ namespace GvasConverter
                         return jo.ToObject<UEQuaternionStructProperty>(serializer);
                     case "VehicleEditorProject":
                         return jo.ToObject<HWUVehicleEditorProject>(serializer);
+                    case TileMarketingDownloadedTexture.PropertyName:
+                        return jo.ToObject<TileMarketingDownloadedTexture>(serializer);
                     default:
                         return jo.ToObject<UEGenericStructProperty>(serializer);
                 }

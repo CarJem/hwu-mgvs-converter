@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using GvasFormat.Serialization.UETypes;
 
-namespace GvasFormat.Serialization.HWTypes
+namespace GvasFormat.Serialization.HotWheelsUnleashed
 {
     [DebuggerDisplay("{Vehicle}", Name = "{LiveryName}")]
     public class HWUVehicleEditorProject : UEStructProperty
@@ -56,7 +56,6 @@ namespace GvasFormat.Serialization.HWTypes
             for (int i = 0; i < TagCount; i++)
                 Tags.Add(reader.ReadUEString());
 
-  
             UnknownUUID = reader.ReadInt64();
             Unknown_00 = reader.ReadBytes(4);
             Unknown_04 = reader.ReadByte();

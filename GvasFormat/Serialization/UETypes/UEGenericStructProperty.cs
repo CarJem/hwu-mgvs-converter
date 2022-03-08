@@ -29,30 +29,5 @@ namespace GvasFormat.Serialization.UETypes
                 prop.Serialize(writer);
             }
         }
-
-        public static UEProperty[] DeserializeArray(BinaryReader reader, string name, string type, string arrayType, long valueLength)
-        {
-            List<UEProperty> array = new List<UEProperty>();
-            var terminator = reader.ReadTerminator();
-            var arrayLength = reader.ReadInt32();
-            for (int i = 0; i < arrayLength; i++)
-            {
-                var item = UESerializer.DeserializeProperty(null, arrayType, -1, reader);
-                array.Add(item);
-            }
-            return array.ToArray();
-        }
-
-        public static void SerializeArray(BinaryWriter writer, UEProperty[] Items)
-        {
-            writer.Write(false); //terminator
-            writer.WriteInt32(Items.Length);
-            for (int i = 0; i < Items.Length; i++)
-            {
-                UEProperty prop = Items[i];
-                if (i == 0) { prop.Serialize(writer); }
-                else { prop.SerializeProp(writer); }
-            }
-        }
     }
 }

@@ -10,11 +10,6 @@ namespace GvasFormat.Serialization.UETypes
         public const string PropertyName = "None";
         public UENoneProperty() { Name = PropertyName; }
 
-
-        public override void SerializeMap(BinaryWriter writer)
-        {
-            throw new NotImplementedException();
-        }
         public override void SerializeProp(BinaryWriter writer)
         {
             long pos = writer.BaseStream.Position;

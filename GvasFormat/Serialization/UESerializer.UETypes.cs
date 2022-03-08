@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using GvasFormat.Serialization.HWTypes;
+using GvasFormat.Serialization.HotWheelsUnleashed;
 using GvasFormat.Serialization.UETypes;
 
 namespace GvasFormat.Serialization
 {
     public static partial class UESerializer
     {
+
+        /// <param name="valueLength">Leave as -1 for properties that are nested within another</param>
         internal static UEProperty DeserializeProperty(string name, string type, long valueLength, BinaryReader reader)
         {
             UEProperty result;
@@ -67,9 +69,15 @@ namespace GvasFormat.Serialization
             }
             return result;
         }
+
+
+
+        /// <param name="valueLength">Leave as -1 for properties that are nested within another</param>
         internal static UEStructProperty DeserializeStruct(string name, string type, string structType, long valueLength, BinaryReader reader)
         {
-            UEStructProperty result;
+            UEStructProperty result = UESerializer.DeserializeHWUSpecialStruct(reader, name, type, structType, valueLength);
+            if (result != null) return result;
+
             switch (structType)
             {
                 case "DateTime":
@@ -93,64 +101,11 @@ namespace GvasFormat.Serialization
                 case "Quat":
                     result = new UEQuaternionStructProperty(reader, name, type, structType, valueLength);
                     break;
-                case "VehicleEditorProject":
-                    result = new HWUVehicleEditorProject(reader, name, type, structType, valueLength);
-                    break;
                 default:
                     result = new UEGenericStructProperty(reader, name, type, structType, valueLength);
                     break;
             }
             return result;
-        }
-        internal static UEProperty[] DeserializeArray(string arrayType, string name, string type, long valueLength, BinaryReader reader)
-        {
-            if (HWUDownloadedLiveries.CanDeserialize(arrayType, name))
-                return new UEProperty[] { new HWUDownloadedLiveries(reader, name) };
-
-            UEProperty[] array;
-
-            switch (arrayType)
-            {
-                case "ByteProperty":
-                    array = UEByteProperty.DeserializeArray(reader, name, type, arrayType, valueLength);
-                    break;
-                case "StructProperty":
-                    array = UEStructProperty.DeserializeArray(reader, name, type, arrayType, valueLength);
-                    break;
-                case "NameProperty":
-                    array = UENameProperty.DeserializeArray(reader, name, type, arrayType, valueLength);
-                    break;
-                default:
-                    array = UEGenericStructProperty.DeserializeArray(reader, name, type, arrayType, valueLength);
-                    break;
-            }
-
-            return array;
-        }
-
-        internal static void SerializeArray(BinaryWriter writer, UEProperty[] items, string name, string arrayType)
-        {
-            if (HWUDownloadedLiveries.CanSerialize(arrayType, items, name))
-            {
-                items[0].SerializeProp(writer);
-                return;
-            }
-
-            switch (arrayType)
-            {
-                case "StructProperty":
-                    UEStructProperty.SerializeArray(writer, items);
-                    break;
-                case "ByteProperty":
-                    UEByteProperty.SerializeArray(writer, items);
-                    break;
-                case "NameProperty":
-                    UENameProperty.SerializeArray(writer, items);
-                    break;
-                default:
-                    UEGenericStructProperty.SerializeArray(writer, items);
-                    break;
-            }
         }
     }
 }

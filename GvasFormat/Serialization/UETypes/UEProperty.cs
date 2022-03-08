@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GvasFormat.Serialization.HotWheelsUnleashed;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -19,12 +20,12 @@ namespace GvasFormat.Serialization.UETypes
         }
 
         public abstract void SerializeProp(BinaryWriter writer);
-        public abstract void SerializeMap(BinaryWriter writer);
 
         internal static UEProperty Deserialize(BinaryReader reader)
         {
-            if (reader.PeekChar() < 0)
-                return null;    
+            var peeked = reader.PeekChar();
+            if (peeked < 0)
+                return null;
 
             var name = reader.ReadUEString();
 
@@ -44,7 +45,7 @@ namespace GvasFormat.Serialization.UETypes
         }
         public void Serialize(BinaryWriter writer)
         {
-            if (Name == UENoneProperty.PropertyName || Name == UEHomelessString.PropertyName || Name == null || Type == HWTypes.HWUDownloadedLiveries.PropertyType)
+            if (Name == UENoneProperty.PropertyName || Name == UEHomelessString.PropertyName || Name == null || UESerializer.IsHWUSpecialSerializable(Name, Type))
             {
                 SerializeProp(writer);
             }

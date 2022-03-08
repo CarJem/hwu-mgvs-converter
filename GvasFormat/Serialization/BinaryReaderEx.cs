@@ -30,23 +30,7 @@ namespace GvasFormat.Serialization
             return Utf8.GetString(valueBytes, 0, valueBytes.Length - 1);
         }
 
-        public static string ReadUEString(this BinaryReader reader, long manualLength)
-        {
-            if (reader.PeekChar() < 0)
-                return null;
-
-            var length = reader.ReadInt32();
-            if (length == 0)
-                return null;
-
-            if (length == 1)
-                return "";
-
-            var valueBytes = reader.ReadBytes((int)manualLength);
-            return Utf8.GetString(valueBytes, 0, (int)manualLength - 1);
-        }
-
-        public static string ReadUEStringProperty(this BinaryReader reader, long vl)
+        public static string ReadUEString(this BinaryReader reader, long vl)
         {
             if (reader.PeekChar() < 0)
                 return null;
@@ -61,6 +45,25 @@ namespace GvasFormat.Serialization
             var valueBytes = reader.ReadBytes((int)vl - 4);
             return Utf8.GetString(valueBytes, 0, length - 1);
         }
+
+        public static byte[] ReadPNG(this BinaryReader reader)
+        {
+            List<byte> data = new List<byte>();
+            List<byte> end = new List<byte>() { 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82 };
+            bool isFinished = false;
+            while (!isFinished)
+            {
+                data.Add(reader.ReadByte());
+                if (data.Count >= 8)
+                {
+                    var trimmed = data.TakeLast<byte>(8).ToList();
+
+                    if (Enumerable.SequenceEqual(trimmed, end)) isFinished = true;
+                }
+            }
+            return data.ToArray();
+        }
+
         public static byte[] ReadJFIF(this BinaryReader reader)
         {
             List<byte> data = new List<byte>();

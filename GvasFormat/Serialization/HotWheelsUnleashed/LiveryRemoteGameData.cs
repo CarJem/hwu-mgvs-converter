@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using GvasFormat.Serialization.UETypes;
 
-namespace GvasFormat.Serialization.HWTypes
+namespace GvasFormat.Serialization.HotWheelsUnleashed
 {
     public class HWULiveryRemoteGameData
     {

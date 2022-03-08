@@ -13,23 +13,24 @@ namespace GvasFormat.Serialization.UETypes
         public UESetProperty() { }
         public UESetProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
-            SetLength = reader.ReadInt32();
-            var terminator = reader.ReadByte();
             ValueType = reader.ReadUEString();
-
-        }
-        public override void SerializeMap(BinaryWriter writer)
-        {
-            throw new NotImplementedException();
+            var terminator = reader.ReadBytes(5);
+            SetLength = reader.ReadInt32();
+            for (int i = 0; i < SetLength; ++i)
+                Properties.Add(UESerializer.DeserializeProperty("", ValueType, -1, reader));
         }
 
         public override void SerializeProp(BinaryWriter writer)
         {
-            writer.WriteInt32(SetLength);
-            writer.Write(false); //terminator
             writer.WriteUEString(ValueType);
+            writer.Write(new byte[5]); //terminator
+            writer.WriteInt32(SetLength);
+            for (int i = 0; i < SetLength; ++i)
+                Properties[i].SerializeProp(writer);
+
         }
 
+        public List<UEProperty> Properties = new List<UEProperty>();
         public int SetLength;
         public string ValueType;
     }

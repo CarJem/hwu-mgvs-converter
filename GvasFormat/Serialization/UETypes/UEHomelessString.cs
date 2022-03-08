@@ -27,17 +27,12 @@ namespace GvasFormat.Serialization.UETypes
             writer.WriteUEString(LegitName);
         }
 
-        public override void SerializeMap(BinaryWriter writer)
-        {
-            throw new NotImplementedException();
-        }
-
         public static bool Exists(BinaryReader reader, string desiredName = UENoneProperty.PropertyName)
         {
             var initalPosition = reader.BaseStream.Position;
 
-            var emptyString = reader.ReadUEString(1);
-            var noneString = reader.ReadUEString(desiredName.Length + 1);
+            var emptyString = reader.ReadUEString();
+            var noneString = reader.ReadUEString();
 
             if (emptyString != "" || noneString != desiredName)
             {
