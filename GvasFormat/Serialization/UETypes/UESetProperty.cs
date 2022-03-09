@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using GvasFormat.Utils;
+using GvasFormat.Serializer;
 
 namespace GvasFormat.Serialization.UETypes
 {

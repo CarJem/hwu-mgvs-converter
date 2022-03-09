@@ -4,8 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using GvasFormat.Serialization.UETypes;
+using GvasFormat.Utils;
 
-namespace GvasFormat.Serialization.HotWheelsUnleashed
+namespace GvasFormat.Serialization.HotWheels
 {
     public class TileMarketingDownloadedTexture : UEStructProperty
     {
@@ -31,7 +32,7 @@ namespace GvasFormat.Serialization.HotWheelsUnleashed
         }
 
         public override void SerializeStructProp(BinaryWriter writer)
-        {
+        {   
             writer.Write(Header);
             writer.Write(false); //terminator
             writer.WriteInt64(Length);

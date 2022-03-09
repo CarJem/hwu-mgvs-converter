@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using GvasFormat.Serialization.HotWheelsUnleashed;
+using GvasFormat.Serialization.HotWheels;
 using GvasFormat.Serialization.UETypes;
 
-namespace GvasFormat.Serialization
+namespace GvasFormat.Serializer
 {
     public static partial class UESerializer
     {

@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace GvasFormat.Serialization
+namespace GvasFormat.Utils
 {
     public static class BinaryReaderEx
     {

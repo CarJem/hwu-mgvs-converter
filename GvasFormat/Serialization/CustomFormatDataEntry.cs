@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GvasFormat
+namespace GvasFormat.Serialization
 {
     public class CustomFormatDataEntry
     {

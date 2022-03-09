@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using GvasFormat.Serialization.UETypes;
 
-namespace GvasFormat
+namespace GvasFormat.Serialization
 {
     /*
      * General format notes:

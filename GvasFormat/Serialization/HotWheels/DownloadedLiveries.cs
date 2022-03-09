@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using GvasFormat.Serialization.UETypes;
+using GvasFormat.Utils;
+using GvasFormat.Serializer;
 
-namespace GvasFormat.Serialization.HotWheelsUnleashed
+namespace GvasFormat.Serialization.HotWheels
 {
     public class HWUDownloadedLiveries : UEProperty
     {

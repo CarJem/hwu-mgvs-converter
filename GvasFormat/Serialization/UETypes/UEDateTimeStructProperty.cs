@@ -3,6 +3,8 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using GvasFormat.Utils;
+using GvasFormat.Serializer;
 
 namespace GvasFormat.Serialization.UETypes
 {

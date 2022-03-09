@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using GvasFormat.Serialization.UETypes;
 using GvasFormat.Utils;
+using GvasFormat.Serialization;
 
-namespace GvasFormat.Serialization
+namespace GvasFormat.Serializer
 {
     public static partial class UESerializer
     {

@@ -1,5 +1,5 @@
 ﻿using GvasFormat;
-using GvasFormat.Serialization.HotWheelsUnleashed;
+using GvasFormat.Serialization.HotWheels;
 using GvasFormat.Serialization.UETypes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GvasConverter
+namespace GvasConverter.Converters
 {
     public class GvasJsonConverter : JsonConverter
     {

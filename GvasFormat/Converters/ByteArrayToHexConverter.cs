@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 
-namespace GvasConverter
+namespace GvasConverter.Converters
 {
     public class ByteArrayToHexConverter : JsonConverter
     {

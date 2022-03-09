@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using GvasFormat.Utils;
+using GvasFormat.Serializer;
 
 namespace GvasFormat.Serialization.UETypes
 {

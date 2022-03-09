@@ -1,4 +1,4 @@
-﻿namespace GvasFormat
+﻿namespace GvasFormat.Serialization
 {
     public struct EngineVersion
     {
