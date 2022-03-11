@@ -11,18 +11,21 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UEByteProperty : UEProperty
     {
         public UEByteProperty() { }
-        public UEByteProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
+        public UEByteProperty(GvasReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
-            var terminator = reader.ReadTerminator();
+            if (valueLength > -1) reader.ReadTerminator();
             var arrayLength = reader.ReadInt32();
             Value = reader.ReadBytes(arrayLength);
         }
 
-        public override void SerializeProp(BinaryWriter writer)
+        public override long SerializeProp(GvasWriter writer)
         {
-            writer.Write(false); //terminator
-            writer.WriteInt32(Value.Length);
-            writer.Write(Value);
+            long size = 0;
+            if (!Indexed) size += writer.Write(false); //terminator
+            size += writer.WriteInt32(Value.Length);
+            size += writer.Write(Value);
+
+            return size;
         }
 
         public byte[] Value;

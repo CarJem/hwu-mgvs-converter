@@ -11,7 +11,7 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UEStringProperty : UEProperty
     {
         public UEStringProperty() { }
-        public UEStringProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
+        public UEStringProperty(GvasReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
             if (valueLength > -1)
             {
@@ -26,13 +26,15 @@ namespace GvasFormat.Serialization.UETypes
 
         }
 
-        public override void SerializeProp(BinaryWriter writer)
+        public override long SerializeProp(GvasWriter writer)
         {
-            if (ValueLength != -1)
-                writer.Write(false); //terminator
-            writer.WriteUEString(Value, ValueLength);
+            long size = 0;
+            if (!Indexed) writer.Write(false); //terminator
+            size += writer.WriteUEString(Value, ValueLength);
+            return size;
         }
 
+        public long ValueLength;
         public string Value;
     }
 }

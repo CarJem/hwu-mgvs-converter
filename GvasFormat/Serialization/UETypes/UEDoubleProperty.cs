@@ -10,10 +10,10 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UEDoubleProperty : UEProperty
     {
         public UEDoubleProperty() { }
-        public UEDoubleProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
+        public UEDoubleProperty(GvasReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
             if (valueLength == -1)
-            {//DoubleProperty in MapProperty
+            {
                 Value = reader.ReadInt32();
                 return;
             }
@@ -28,11 +28,14 @@ namespace GvasFormat.Serialization.UETypes
             Value = reader.ReadDouble();
         }
 
-        public override void SerializeProp(BinaryWriter writer)
+        public override long SerializeProp(GvasWriter writer)
         {
-            if (ValueLength != -1)
-                writer.Write(false); //terminator
-            writer.WriteDouble(Value);
+            long size = 0;
+
+            if (!Indexed) writer.Write(false); //terminator
+            size += writer.WriteDouble(Value);
+
+            return size;
         }
 
         public double Value;

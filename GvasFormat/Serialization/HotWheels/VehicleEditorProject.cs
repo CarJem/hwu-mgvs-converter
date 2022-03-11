@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using GvasFormat.Serialization.UETypes;
+using GvasFormat.Serializer;
 
 namespace GvasFormat.Serialization.HotWheels
 {
@@ -14,9 +15,7 @@ namespace GvasFormat.Serialization.HotWheels
 
         public Guid Guid { get; set; }
         public string LiveryName { get; set; }
-        public int TagCount { get; set; }
         public List<string> Tags { get; set; } = new List<string>();
-
         public Int64 UnknownUUID { get; set; }
         public byte[] Unknown_00 { get; set; }
         public byte Unknown_04 { get; set; }
@@ -25,33 +24,26 @@ namespace GvasFormat.Serialization.HotWheels
         public byte Unknown_07 { get; set; }
         public byte[] Unknown_08 { get; set; }
         public byte[] Unknown_10 { get; set; }
-
         public Int64 DataSize { get; set; }
         public Int64 Unknown_18 { get; set; }
-
         public byte[] Unknown_20 { get; set; } = new byte[0];
-
         public Int64 Unknown_LongA { get; set; }
         public Int64 Unknown_LongB { get; set; }
-
         public byte[] Data { get; set; }
-
         public string Material { get; set; }
-
         public byte[] JFIFJunk { get; set; }
         public byte[] JFIFData { get; set; }
-
-        public string Vehicle { get; set; }
-
         public List<UEProperty> Properties { get; set; } = new List<UEProperty>();
+        public string Vehicle { get; set; }
+        public List<string> Versions { get; set; } = new List<string>();
 
         public HWUVehicleEditorProject() { }
-        public HWUVehicleEditorProject(BinaryReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
+        public HWUVehicleEditorProject(GvasReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
         {
             Guid = new Guid(reader.ReadBytes(16));
             LiveryName = reader.ReadUEString();
 
-            TagCount = reader.ReadInt32();
+            var TagCount = reader.ReadInt32();
 
             for (int i = 0; i < TagCount; i++)
                 Tags.Add(reader.ReadUEString());
@@ -81,49 +73,67 @@ namespace GvasFormat.Serialization.HotWheels
             JFIFData = reader.ReadJFIF();
 
             UEProperty prop;
-            while ((prop = Deserialize(reader)).Name != UENoneProperty.PropertyName)
+            while ((prop = UESerializer.Deserialize(reader)).Name != UENoneProperty.PropertyName)
                 Properties.Add(prop);
 
             Vehicle = reader.ReadUEString();
+
+            if (Tags.Contains("Versioned"))
+            {
+                var versionCount = reader.ReadInt32();
+
+                for (int i = 0; i < versionCount; i++)
+                    Versions.Add(reader.ReadUEString());
+            }
         }
 
-        public override void SerializeStructProp(BinaryWriter writer)
+        public override long SerializeStructProp(GvasWriter writer)
         {
-            writer.Write(Guid.ToByteArray());
-            writer.WriteUEString(LiveryName);
-            writer.WriteInt32(TagCount);
+            long size = 0;
+            size += writer.Write(Guid.ToByteArray());
+            size += writer.WriteUEString(LiveryName);
+            size += writer.WriteInt32(Tags.Count);
 
-            for (int i = 0; i < TagCount; i++)
-                writer.WriteUEString(Tags[i]);
+            for (int i = 0; i < Tags.Count; i++)
+                size += writer.WriteUEString(Tags[i]);
 
-            writer.WriteInt64(UnknownUUID);
-            writer.Write(Unknown_00);
-            writer.Write(Unknown_04);
-            writer.Write(Unknown_05);
-            writer.Write(SomeIterable);
-            writer.Write(Unknown_07);
-            writer.Write(Unknown_08);
-            writer.Write(Unknown_10);
+            size += writer.WriteInt64(UnknownUUID);
+            size += writer.Write(Unknown_00);
+            size += writer.Write(Unknown_04);
+            size += writer.Write(Unknown_05);
+            size += writer.Write(SomeIterable);
+            size += writer.Write(Unknown_07);
+            size += writer.Write(Unknown_08);
+            size += writer.Write(Unknown_10);
 
-            writer.WriteInt64(DataSize);
-            writer.WriteInt64(Unknown_18);
+            size += writer.WriteInt64(DataSize);
+            size += writer.WriteInt64(Unknown_18);
 
-            if (SomeIterable != 0) writer.Write(Unknown_20);
+            if (SomeIterable != 0) size += writer.Write(Unknown_20);
 
-            writer.WriteInt64(Unknown_LongA);
-            writer.WriteInt64(Unknown_LongB);
+            size += writer.WriteInt64(Unknown_LongA);
+            size += writer.WriteInt64(Unknown_LongB);
 
-            writer.Write(Data);
-            writer.WriteUEString(Material);
+            size += writer.Write(Data);
+            size += writer.WriteUEString(Material);
 
-            writer.Write(JFIFJunk);
-            writer.Write(JFIFData);
+            size += writer.Write(JFIFJunk);
+            size += writer.Write(JFIFData);
 
             for (int i = 0; i < Properties.Count; i++)
-                Properties[i].Serialize(writer);
-            writer.WriteUENoneProperty();
+                size += Properties[i].Serialize(writer);
+            size += writer.WriteUENoneProperty();
 
-            writer.WriteUEString(Vehicle);
+            size += writer.WriteUEString(Vehicle);
+
+            if (Tags.Contains("Versioned"))
+            {
+                size += writer.WriteInt32(Versions.Count);
+                for (int i = 0; i < Versions.Count; i++)
+                    size += writer.WriteUEString(Versions[i]);
+            }
+
+            return size;
         }
 
 

@@ -12,40 +12,44 @@ namespace GvasFormat.Serialization.HotWheels
         public const string PropertyType = "HWUDownloadedLiveries";
         public const string OriginalType = "ByteProperty";
         public const string OriginalName = "DownloadedLiveries";
-
-        public int UnknownA { get; set; }
-        public int Size { get; set; }
         public List<HWULiveryRemoteGameData> Items { get; set; } = new List<HWULiveryRemoteGameData>();
 
         public HWUDownloadedLiveries()
         {
             Type = PropertyType;
             Name = OriginalName;
-        }
+        }   
 
-        public HWUDownloadedLiveries(BinaryReader reader, string name)
+        public HWUDownloadedLiveries(GvasReader reader, string name) : base (name, PropertyType, -1)
         {
-            Type = PropertyType;
-            Name = name;
+            var arrayLength = reader.ReadInt32();
+            var size = reader.ReadInt32();
 
-            reader.ReadTerminator();
-            UnknownA = reader.ReadInt32();
-            Size = reader.ReadInt32();
-
-
-            for (int i = 0; i < Size; i++)
+            for (int i = 0; i < size; i++)
+            {
                 Items.Add(new HWULiveryRemoteGameData(reader));
+            }
         }
 
 
-        public override void SerializeProp(BinaryWriter writer)
+        public override long SerializeProp(GvasWriter writer)
         {
-            writer.Write(false); //terminator
-            writer.WriteInt32(UnknownA);
-            writer.WriteInt32(Size);
+            long size = 0;
 
-            for (int i = 0; i < Items.Count; i++)
-                Items[i].SerializeProp(writer);
+            var memory = new MemoryStream();
+            long byteLength = 0;
+            using (var data = new GvasWriter(memory, System.Text.Encoding.Default, true))
+            {
+                byteLength += data.WriteInt32(Items.Count);
+                for (int i = 0; i < Items.Count; i++)
+                    byteLength += Items[i].SerializeProp(data);
+            }
+
+            size += writer.WriteInt32((int)byteLength);
+            writer.Write(memory.ToArray());
+            memory.Close();
+
+            return byteLength + size;
         }
         public static bool CanDeserialize(string arrayType, string name)
         {

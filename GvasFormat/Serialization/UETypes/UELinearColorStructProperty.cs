@@ -10,8 +10,9 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UELinearColorStructProperty : UEStructProperty
     {
         public UELinearColorStructProperty() { }
-        public UELinearColorStructProperty(BinaryReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
+        public UELinearColorStructProperty(GvasReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
         {
+            ValueLength = valueLength;
             R = reader.ReadSingle();
             G = reader.ReadSingle();
             B = reader.ReadSingle();
@@ -20,13 +21,17 @@ namespace GvasFormat.Serialization.UETypes
 
         public float R, G, B, A;
 
-        public override void SerializeStructProp(BinaryWriter writer)
+        public override long SerializeStructProp(GvasWriter writer)
         {
-            if (ValueLength == 0) return;
-            writer.WriteSingle(R);
-            writer.WriteSingle(G);
-            writer.WriteSingle(B);
-            writer.WriteSingle(A);
+            long size = 0;
+            if (ValueLength == 0) return size;
+            size += writer.WriteSingle(R);
+            size += writer.WriteSingle(G);
+            size += writer.WriteSingle(B);
+            size += writer.WriteSingle(A);
+            return size;
         }
+
+        public long ValueLength;
     }
 }

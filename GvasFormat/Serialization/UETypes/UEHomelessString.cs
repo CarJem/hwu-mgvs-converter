@@ -23,13 +23,15 @@ namespace GvasFormat.Serialization.UETypes
             LegitName = name;
         }
 
-        public override void SerializeProp(BinaryWriter writer)
+        public override long SerializeProp(GvasWriter writer)
         {
-            writer.WriteInt32(1);
-            writer.WriteUEString(LegitName);
+            long size = 0;
+            size += writer.WriteInt32(1);
+            size += writer.WriteUEString(LegitName);
+            return size;
         }
 
-        public static bool Exists(BinaryReader reader, string desiredName = UENoneProperty.PropertyName)
+        public static bool Exists(GvasReader reader, string desiredName = UENoneProperty.PropertyName)
         {
             var initalPosition = reader.BaseStream.Position;
 

@@ -12,10 +12,11 @@ namespace GvasFormat.Serialization.UETypes
         public const string PropertyName = "None";
         public UENoneProperty() { Name = PropertyName; }
 
-        public override void SerializeProp(BinaryWriter writer)
+        public override long SerializeProp(GvasWriter writer)
         {
-            long pos = writer.BaseStream.Position;
-            writer.WriteUEString(UENoneProperty.PropertyName);
+            long size = 0;
+            size += writer.WriteUEString(UENoneProperty.PropertyName);
+            return size;
         }
     }
 }

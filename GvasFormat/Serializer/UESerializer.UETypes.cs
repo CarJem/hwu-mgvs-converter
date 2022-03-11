@@ -3,14 +3,32 @@ using System.Collections.Generic;
 using System.IO;
 using GvasFormat.Serialization.HotWheels;
 using GvasFormat.Serialization.UETypes;
+using GvasFormat.Utils;
 
 namespace GvasFormat.Serializer
 {
     public static partial class UESerializer
     {
+        internal static UEProperty Deserialize(GvasReader reader)
+        {
+            var peeked = reader.PeekChar();
+            if (peeked < 0)
+                return null;
 
+            var name = reader.ReadUEString();
+
+            if (name == null)
+                return null;
+
+            if (name == UENoneProperty.PropertyName)
+                return new UENoneProperty { Name = name };
+
+            var type = reader.ReadUEString();
+            var valueLength = reader.ReadInt64();
+            return UESerializer.DeserializeProperty(name, type, valueLength, reader);
+        }
         /// <param name="valueLength">Leave as -1 for properties that are nested within another</param>
-        internal static UEProperty DeserializeProperty(string name, string type, long valueLength, BinaryReader reader)
+        internal static UEProperty DeserializeProperty(string name, string type, long valueLength, GvasReader reader)
         {
             UEProperty result;
             var itemOffset = reader.BaseStream.Position;
@@ -69,11 +87,8 @@ namespace GvasFormat.Serializer
             }
             return result;
         }
-
-
-
         /// <param name="valueLength">Leave as -1 for properties that are nested within another</param>
-        internal static UEStructProperty DeserializeStruct(string name, string type, string structType, long valueLength, BinaryReader reader)
+        internal static UEStructProperty DeserializeStruct(string name, string type, string structType, long valueLength, GvasReader reader)
         {
             UEStructProperty result = UESerializer.DeserializeHWUSpecialStruct(reader, name, type, structType, valueLength);
             if (result != null) return result;

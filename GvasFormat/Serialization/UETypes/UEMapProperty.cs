@@ -13,19 +13,21 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UEMapProperty : UEProperty
     {
         public UEMapProperty() { }
-        public UEMapProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
+        public UEMapProperty(GvasReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
             KeyType = reader.ReadUEString();
             ValueType = reader.ReadUEString();
-            var unknown = reader.ReadBytes(5);
+
+            var terminator = reader.ReadTerminator();
+            var unknown = reader.ReadBytes(4);
             if (unknown.Any(b => b != 0))
-                throw new InvalidOperationException($"Offset: 0x{reader.BaseStream.Position-5:x8}. Expected ??? to be 0, but was 0x{unknown}");
+                throw new InvalidOperationException($"Offset: 0x{reader.BaseStream.Position-4:x8}. Expected ??? to be 0, but was 0x{unknown}");
 
             var count = reader.ReadInt32();
             for (var i = 0; i < count; i++)
             {
                 UEProperty key, value;
-                if (KeyType == "StructProperty") key = Deserialize(reader);
+                if (KeyType == "StructProperty") key = UESerializer.Deserialize(reader);
                 else key = UESerializer.DeserializeProperty(null, KeyType, -1, reader);
 
                 var values = new List<UEProperty>();
@@ -36,7 +38,7 @@ namespace GvasFormat.Serialization.UETypes
                         if (UESerializer.DoesSpecialHWUStructExists(reader))
                             value = UESerializer.DeserializeSpecialHWUStruct(reader, null, ValueType, TileMarketingDownloadedTexture.PropertyName, -1);
 
-                        else value = Deserialize(reader);
+                        else value = UESerializer.Deserialize(reader);
 
                         values.Add(value);
                     }
@@ -52,33 +54,35 @@ namespace GvasFormat.Serialization.UETypes
             }
             if (count == 0)
             {
-                Deserialize(reader);
+                UESerializer.Deserialize(reader);
             }
         }
 
-        public override void SerializeProp(BinaryWriter writer)
+        public override long SerializeProp(GvasWriter writer)
         {
+            long size = 0;
             writer.WriteUEString(KeyType);
             writer.WriteUEString(ValueType);
-            writer.WriteInt32(0); //unknown
-            writer.Write(false); //unknown
-            writer.WriteInt32(Map.Count);
+            writer.Write(false); //terminator
+            size += writer.WriteInt32(0); //unknown
+            size += writer.WriteInt32(Map.Count);
 
             foreach (UEKeyValuePair p in Map)
             {
-                if (KeyType == "StructProperty") p.Key.Serialize(writer);
-                else p.Key.SerializeProp(writer);
+                if (KeyType == "StructProperty") size += p.Key.Serialize(writer);
+                else size += p.Key.SerializeProp(writer);
 
                 foreach (UEProperty v in p.Values)
                 {
-                    if (ValueType == "StructProperty") v.Serialize(writer);
-                    else v.SerializeProp(writer);
+                    if (ValueType == "StructProperty") size += v.Serialize(writer);
+                    else size += v.SerializeProp(writer);
                 }
             }
             if (Map.Count == 0)
             {
-               new UENoneProperty().Serialize(writer);
+                size += new UENoneProperty().SerializeProp(writer);
             }
+            return size;
         }
 
         public List<UEKeyValuePair> Map = new List<UEKeyValuePair>();

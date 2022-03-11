@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using GvasFormat.Utils;
 using GvasFormat.Serializer;
+using Newtonsoft.Json;
 
 namespace GvasFormat.Serialization.UETypes
 {
@@ -11,7 +12,10 @@ namespace GvasFormat.Serialization.UETypes
     {
         public string Name;
         public string Type;
-        public long ValueLength;
+        public bool Indexed = false;
+
+        [JsonIgnore] 
+        private long ValueLength;
 
         public UEProperty() { }
         public UEProperty(string name, string type, long valueLength)
@@ -19,44 +23,32 @@ namespace GvasFormat.Serialization.UETypes
             Name = name;
             Type = type;
             ValueLength = valueLength;
+            if (valueLength == -1) Indexed = true;
         }
 
-        public abstract void SerializeProp(BinaryWriter writer);
-
-        internal static UEProperty Deserialize(BinaryReader reader)
+        public abstract long SerializeProp(GvasWriter writer);
+        public long Serialize(GvasWriter writer, bool bodyLengthOnly = false)
         {
-            var peeked = reader.PeekChar();
-            if (peeked < 0)
-                return null;
 
-            var name = reader.ReadUEString();
-
-            if (name == null)
-                return null;
-
-            if (name == UENoneProperty.PropertyName)
-                return new UENoneProperty { Name = name };
-
-            var type = reader.ReadUEString();
-
-            if (name == string.Empty && type == UENoneProperty.PropertyName)
-                return new UEHomelessString();
-
-            var valueLength = reader.ReadInt64();
-            return UESerializer.DeserializeProperty(name, type, valueLength, reader);
-        }
-        public void Serialize(BinaryWriter writer)
-        {
-            if (Name == UENoneProperty.PropertyName || Name == UEHomelessString.PropertyName || Name == null || UESerializer.IsHWUSpecialSerializable(Name, Type))
+            if (Name == UENoneProperty.PropertyName || Name == null || UESerializer.IsHWUSpecialSerializable(Name, Type))
             {
-                SerializeProp(writer);
+                return SerializeProp(writer);
             }
             else
             {
-                writer.WriteUEString(Name);
-                writer.WriteUEString(Type);
-                writer.WriteInt64(ValueLength);
-                SerializeProp(writer);
+                long size = 0;
+
+                size += writer.WriteUEString(Name);
+                size += writer.WriteUEString(Type);
+
+                var memory = new MemoryStream();
+                long length = 0;
+                using (var data = new GvasWriter(memory, System.Text.Encoding.Default, true)) length = SerializeProp(data);
+                size += writer.WriteInt64(length);
+                size += writer.Write(memory.ToArray());
+                memory.Close();
+
+                return size;
             }
         }
     }

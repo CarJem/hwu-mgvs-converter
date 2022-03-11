@@ -12,7 +12,7 @@ namespace GvasFormat.Serializer
     {
         public static Gvas Read(Stream stream)
         {
-            using (var reader = new BinaryReader(stream, Encoding.ASCII, true))
+            using (var reader = new GvasReader(stream, Encoding.ASCII, true))
             {
                 var header = reader.ReadBytes(Gvas.Header.Length);
                 if (!Gvas.Header.SequenceEqual(header))
@@ -38,7 +38,7 @@ namespace GvasFormat.Serializer
                 }
                 result.SaveGameType = reader.ReadUEString();
 
-                while (UEProperty.Deserialize(reader) is UEProperty prop)
+                while (UESerializer.Deserialize(reader) is UEProperty prop)
                     result.Properties.Add(prop);
 
                 result.Leftovers = reader.ReadBytes((int)(reader.BaseStream.Length - reader.BaseStream.Position));
@@ -49,7 +49,7 @@ namespace GvasFormat.Serializer
 
         public static void Write(FileStream stream, Gvas data)
         {
-            using (BinaryWriter writer = new BinaryWriter(stream, Encoding.ASCII, true))
+            using (GvasWriter writer = new GvasWriter(stream, Encoding.ASCII, true))
             {
                 writer.Write(Gvas.Header);
 

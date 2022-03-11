@@ -15,7 +15,7 @@ namespace GvasFormat.Serialization.UETypes
             StructType = structType;
         }
 
-        public static UEStructProperty Read(BinaryReader reader, string name, string type, long valueLength)
+        public static UEStructProperty Read(GvasReader reader, string name, string type, long valueLength)
         {
             var structType = reader.ReadUEString();
 
@@ -31,20 +31,22 @@ namespace GvasFormat.Serialization.UETypes
             return result;
         }
 
-        public abstract void SerializeStructProp(BinaryWriter writer);
+        public abstract long SerializeStructProp(GvasWriter writer);
 
-        public override void SerializeProp(BinaryWriter writer)
+        public override long SerializeProp(GvasWriter writer)
         {
             if (UESerializer.IsHWUDirectSeralizableStructureProperty(StructType))
             {
-                SerializeStructProp(writer);
+                return SerializeStructProp(writer);
             } 
             else
             {
+                long size = 0;
                 writer.WriteUEString(StructType);
                 writer.Write(Guid.Empty.ToByteArray());
                 writer.Write(false);
-                SerializeStructProp(writer);
+                size += SerializeStructProp(writer);
+                return size;
             }
 
         }

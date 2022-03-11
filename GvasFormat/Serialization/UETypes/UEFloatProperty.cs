@@ -10,7 +10,7 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UEFloatProperty : UEProperty
     {
         public UEFloatProperty() { }
-        public UEFloatProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
+        public UEFloatProperty(GvasReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
             var terminator = reader.ReadByte();
             if (terminator != 0)
@@ -22,10 +22,12 @@ namespace GvasFormat.Serialization.UETypes
             Value = reader.ReadSingle();
         }
 
-        public override void SerializeProp(BinaryWriter writer)
+        public override long SerializeProp(GvasWriter writer)
         {
+            long size = 0;
             writer.Write(false); //terminator
-            writer.WriteSingle(Value);
+            size += writer.WriteSingle(Value);
+            return size;
         }
 
         public float Value;

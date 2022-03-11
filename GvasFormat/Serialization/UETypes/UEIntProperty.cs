@@ -10,7 +10,7 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UEIntProperty : UEProperty
     {
         public UEIntProperty() { }
-        public UEIntProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
+        public UEIntProperty(GvasReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
             if (valueLength == -1)
             {//IntProperty in MapProperty
@@ -28,11 +28,13 @@ namespace GvasFormat.Serialization.UETypes
             Value = reader.ReadInt32();
         }
 
-        public override void SerializeProp(BinaryWriter writer)
+        public override long SerializeProp(GvasWriter writer)
         {
-            if (ValueLength != -1)
+            long size = 0;
+            if (!Indexed)
                 writer.Write(false); //terminator
-            writer.WriteInt32(Value);
+            size += writer.WriteInt32(Value);
+            return size;
         }
 
         public int Value;

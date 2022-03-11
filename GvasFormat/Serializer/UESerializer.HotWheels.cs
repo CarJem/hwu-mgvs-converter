@@ -6,22 +6,23 @@ using System.Text;
 using GvasFormat.Serialization.HotWheels;
 using GvasFormat.Serialization.UETypes;
 using GvasFormat.Serialization;
+using GvasFormat.Utils;
 
 namespace GvasFormat.Serializer
 {
     public static partial class UESerializer
     {
-        internal static UEProperty DeserializeHWUSpecialByteArray(BinaryReader reader, string itemType, string name)
+        internal static UEProperty DeserializeHWUSpecialByteArray(GvasReader reader, string itemType, string name)
         {
             return new HWUDownloadedLiveries(reader, name);
         }
         /// <param name="valueLength">Leave as -1 for properties that are nested within another</param>
-        internal static UEProperty DeserializeSpecialHWUStruct(BinaryReader reader, string name, string valueType, string propertyName, int valueLength)
+        internal static UEProperty DeserializeSpecialHWUStruct(GvasReader reader, string name, string valueType, string propertyName, int valueLength)
         {
             return new TileMarketingDownloadedTexture(reader, null, valueType, TileMarketingDownloadedTexture.PropertyName, -1);      
         }
         /// <param name="valueLength">Leave as -1 for properties that are nested within another</param>
-        internal static UEStructProperty DeserializeHWUSpecialStruct(BinaryReader reader, string name, string type, string structType, long valueLength)
+        internal static UEStructProperty DeserializeHWUSpecialStruct(GvasReader reader, string name, string type, string structType, long valueLength)
         {
             UEStructProperty result;
             switch (structType)
@@ -57,14 +58,14 @@ namespace GvasFormat.Serializer
         {
             return structType.Equals(TileMarketingDownloadedTexture.PropertyName);
         }
-        internal static bool DoesSpecialHWUStructExists(BinaryReader reader)
+        internal static bool DoesSpecialHWUStructExists(GvasReader reader)
         {
             return TileMarketingDownloadedTexture.Exists(reader);
         }
 
-        internal static void SerializeHWUSpecialByteArray(BinaryWriter writer, UEProperty[] items, string itemType, string name)
+        internal static long SerializeHWUSpecialByteArray(GvasWriter writer, UEProperty item, string itemType, string name)
         {
-            items.First().SerializeProp(writer);
+            return item.SerializeProp(writer);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GvasFormat.Serializer;
+using GvasFormat.Utils;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,9 +14,9 @@ namespace GvasFormat.Serialization.UETypes
 
         public UEGenericStructProperty() { }
 
-        public UEGenericStructProperty(BinaryReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
+        public UEGenericStructProperty(GvasReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
         {
-            while (Deserialize(reader) is UEProperty prop)
+            while (UESerializer.Deserialize(reader) is UEProperty prop)
             {
                 Properties.Add(prop);
                 if (prop is UENoneProperty)
@@ -22,12 +24,14 @@ namespace GvasFormat.Serialization.UETypes
             }
         }
 
-        public override void SerializeStructProp(BinaryWriter writer)
+        public override long SerializeStructProp(GvasWriter writer)
         {
+            long size = 0;
             foreach (UEProperty prop in Properties)
             {
-                prop.Serialize(writer);
+                size += prop.Serialize(writer);
             }
+            return size;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace GvasFormat.Serialization.UETypes
         private static readonly Encoding Utf8 = new UTF8Encoding(false);
 
         public UETextProperty() { }
-        public UETextProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
+        public UETextProperty(GvasReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
             var terminator = reader.ReadByte();
             if (terminator != 0)
@@ -34,12 +34,14 @@ namespace GvasFormat.Serialization.UETypes
             Value = reader.ReadUEString();
         }
 
-        public override void SerializeProp(BinaryWriter writer)
+        public override long SerializeProp(GvasWriter writer)
         {
+            long size = 0;
             writer.Write(false); //terminator
-            writer.WriteInt64(Flags);
-            writer.Write(Byte.Parse(Id));
-            writer.WriteUEString(Value);
+            size += writer.WriteInt64(Flags);
+            size += writer.Write(Byte.Parse(Id));
+            size += writer.WriteUEString(Value);
+            return size;
         }
 
         public long Flags;

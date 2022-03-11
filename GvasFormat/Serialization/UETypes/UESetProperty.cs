@@ -12,23 +12,26 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UESetProperty : UEProperty
     {
         public UESetProperty() { }
-        public UESetProperty(BinaryReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
+        public UESetProperty(GvasReader reader, string name, string type, long valueLength) : base(name, type, valueLength)
         {
             ValueType = reader.ReadUEString();
-            var terminator = reader.ReadBytes(5);
+            var terminator = reader.ReadTerminator();
+            var blank = reader.ReadBytes(4);
             SetLength = reader.ReadInt32();
             for (int i = 0; i < SetLength; ++i)
                 Properties.Add(UESerializer.DeserializeProperty("", ValueType, -1, reader));
         }
 
-        public override void SerializeProp(BinaryWriter writer)
+        public override long SerializeProp(GvasWriter writer)
         {
+            long size = 0;
             writer.WriteUEString(ValueType);
-            writer.Write(new byte[5]); //terminator
-            writer.WriteInt32(SetLength);
+            writer.Write(false); //terminator
+            size += writer.Write(new byte[4]); //blank
+            size += writer.WriteInt32(SetLength);
             for (int i = 0; i < SetLength; ++i)
-                Properties[i].SerializeProp(writer);
-
+                size += Properties[i].SerializeProp(writer);
+            return size;
         }
 
         public List<UEProperty> Properties = new List<UEProperty>();

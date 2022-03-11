@@ -10,7 +10,7 @@ namespace GvasFormat.Serialization.UETypes
     public sealed class UEVectorStructProperty : UEStructProperty
     {
         public UEVectorStructProperty() { }
-        public UEVectorStructProperty(BinaryReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
+        public UEVectorStructProperty(GvasReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
         {
             StructType = structType;
 
@@ -21,11 +21,13 @@ namespace GvasFormat.Serialization.UETypes
 
         public float X, Y, Z;
 
-        public override void SerializeStructProp(BinaryWriter writer)
+        public override long SerializeStructProp(GvasWriter writer)
         {
-            writer.WriteSingle(X);
-            writer.WriteSingle(Y);
-            writer.WriteSingle(Z);
+            long size = 0;
+            size += writer.WriteSingle(X);
+            size += writer.WriteSingle(Y);
+            size += writer.WriteSingle(Z);
+            return size;
         }
     }
 }

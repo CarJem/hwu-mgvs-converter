@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GvasFormat.Utils;
+using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -9,16 +10,18 @@ namespace GvasFormat.Serialization.UETypes
     {
         public UEGuidStructProperty() { }
 
-        public UEGuidStructProperty(BinaryReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
+        public UEGuidStructProperty(GvasReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
         {
             Value = new Guid(reader.ReadBytes(16));
         }
 
         public Guid Value;
 
-        public override void SerializeStructProp(BinaryWriter writer)
+        public override long SerializeStructProp(GvasWriter writer)
         {
-            writer.Write(Value.ToByteArray());
+            long size = 0;
+            size += writer.Write(Value.ToByteArray());
+            return size;
         }
     }
 }
