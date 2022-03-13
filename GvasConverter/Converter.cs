@@ -12,11 +12,11 @@ namespace GvasConverter
     public static class Converter
     {
 
-        public static void AccuracyTest(string inFile)
+        public static void AccuracyTest(string inFile, string outFile = null)
         {
             string fileName = Path.GetFileNameWithoutExtension(inFile);
             string jsonFile = fileName + ".json";
-            string outFile = fileName + ".test.sav";
+            if (outFile == null) outFile = fileName + ".test.sav";
             SavToJson(inFile, jsonFile);
             JsonToSav(jsonFile, outFile);
         }

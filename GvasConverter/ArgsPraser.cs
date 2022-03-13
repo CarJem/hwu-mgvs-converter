@@ -31,7 +31,7 @@ namespace GvasConverter
             else
             {
                 ArgsPraser result;
-                if (args.Length == 2 && args[0] == "--test") result = PraseAccuracyTest(args);
+                if (args.Length >= 2 && args.Length <= 3 && args[0] == "--test") result = PraseAccuracyTest(args);
                 else if (args.Length >= 1 && args.Length < 3) result = PraseClassic(args);
                 else result = null;
 
@@ -103,6 +103,7 @@ namespace GvasConverter
 
             ArgsPraser result = new ArgsPraser();
             result.Input = inFile;
+            if (args.Length == 3) result.Output = args[2];
             result.Operation = OperationType.AccuracyTest;
             return result;
         }

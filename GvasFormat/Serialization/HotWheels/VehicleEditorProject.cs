@@ -6,37 +6,14 @@ using System.IO;
 using System.Linq;
 using GvasFormat.Serialization.UETypes;
 using GvasFormat.Serializer;
+using Newtonsoft.Json;
 
 namespace GvasFormat.Serialization.HotWheels
 {
     [DebuggerDisplay("{Vehicle}", Name = "{LiveryName}")]
     public class HWUVehicleEditorProject : UEStructProperty
     {
-
-        public Guid Guid { get; set; }
-        public string LiveryName { get; set; }
-        public List<string> Tags { get; set; } = new List<string>();
-        public Int64 UnknownUUID { get; set; }
-        public byte[] Unknown_00 { get; set; }
-        public byte Unknown_04 { get; set; }
-        public byte Unknown_05 { get; set; }
-        public byte SomeIterable { get; set; }
-        public byte Unknown_07 { get; set; }
-        public byte[] Unknown_08 { get; set; }
-        public byte[] Unknown_10 { get; set; }
-        public Int64 DataSize { get; set; }
-        public Int64 Unknown_18 { get; set; }
-        public byte[] Unknown_20 { get; set; } = new byte[0];
-        public Int64 Unknown_LongA { get; set; }
-        public Int64 Unknown_LongB { get; set; }
-        public byte[] Data { get; set; }
-        public string Material { get; set; }
-        public byte[] JFIFJunk { get; set; }
-        public byte[] JFIFData { get; set; }
-        public List<UEProperty> Properties { get; set; } = new List<UEProperty>();
-        public string Vehicle { get; set; }
-        public List<string> Versions { get; set; } = new List<string>();
-
+        public const bool DEV_DoNotModifyDataChunks = true;
         public HWUVehicleEditorProject() { }
         public HWUVehicleEditorProject(GvasReader reader, string name, string type, string structType, long valueLength) : base(name, type, structType, valueLength)
         {
@@ -48,29 +25,35 @@ namespace GvasFormat.Serialization.HotWheels
             for (int i = 0; i < TagCount; i++)
                 Tags.Add(reader.ReadUEString());
 
-            UnknownUUID = reader.ReadInt64();
-            Unknown_00 = reader.ReadBytes(4);
-            Unknown_04 = reader.ReadByte();
-            Unknown_05 = reader.ReadByte();
-            SomeIterable = reader.ReadByte();
-            Unknown_07 = reader.ReadByte();
-            Unknown_08 = reader.ReadBytes(8);
-            Unknown_10 = reader.ReadBytes(8);
+            Unknown = reader.ReadBytes(14);
 
-            DataSize = reader.ReadInt64();
-            Unknown_18 = reader.ReadInt64();
+            var ChunkCount = reader.ReadInt16();
+            isChunkSizeOdd = ChunkCount % 2 == 1;
 
-            int arraySize = SomeIterable - (int)SomeIterable % 2;
-            if (SomeIterable != 0) Unknown_20 = reader.ReadBytes(8 * arraySize);
+            MaxDecompressedDataSize = reader.ReadInt64();
+            MaxCompressedDataSize = reader.ReadInt64();
+            var TotalCompressedDataSize = reader.ReadInt64();
+            var TotalDecompressedDataSize = reader.ReadInt64();
 
-            Unknown_LongA = reader.ReadInt64();
-            Unknown_LongB = reader.ReadInt64();
+            var DataCount = DeserializeDataChunkCount(ChunkCount);
+            var SizeCalculations = new List<KeyValuePair<long, long>>();
 
-            Data = reader.ReadBytes((int)DataSize);
+            for (int i = 0; i < DataCount; i++)
+                SizeCalculations.Add(new KeyValuePair<long, long>(reader.ReadInt64(), reader.ReadInt64()));
+
+            for (int i = 0; i < DataCount; i++)
+                DataChunks.Add(new DataChunk(reader, SizeCalculations[i].Key, SizeCalculations[i].Value));
+
             Material = reader.ReadUEString();
-            
-            JFIFJunk = reader.ReadBytes(25);
-            JFIFData = reader.ReadJFIF();
+
+            Something1 = reader.ReadInt32();
+            Something2 = reader.ReadInt32();
+            Something3 = reader.ReadInt32();
+            Something4 = reader.ReadInt32();
+            Something5 = reader.ReadByte();
+
+            var JFIFSize = reader.ReadInt64();
+            JFIFData = reader.ReadBytes((int)JFIFSize);
 
             UEProperty prop;
             while ((prop = UESerializer.Deserialize(reader)).Name != UENoneProperty.PropertyName)
@@ -97,27 +80,33 @@ namespace GvasFormat.Serialization.HotWheels
             for (int i = 0; i < Tags.Count; i++)
                 size += writer.WriteUEString(Tags[i]);
 
-            size += writer.WriteInt64(UnknownUUID);
-            size += writer.Write(Unknown_00);
-            size += writer.Write(Unknown_04);
-            size += writer.Write(Unknown_05);
-            size += writer.Write(SomeIterable);
-            size += writer.Write(Unknown_07);
-            size += writer.Write(Unknown_08);
-            size += writer.Write(Unknown_10);
+            size += writer.Write(Unknown);
 
-            size += writer.WriteInt64(DataSize);
-            size += writer.WriteInt64(Unknown_18);
+            size += writer.WriteInt16(SerializeDataChunkCount());
+            size += writer.WriteInt64(MaxDecompressedDataSize);
+            size += writer.WriteInt64(MaxCompressedDataSize);
 
-            if (SomeIterable != 0) size += writer.Write(Unknown_20);
+            size += writer.WriteInt64(GetTotalCompressedDataSize());
+            size += writer.WriteInt64(GetTotalDecompressedDataSize());
 
-            size += writer.WriteInt64(Unknown_LongA);
-            size += writer.WriteInt64(Unknown_LongB);
+            for (int i = 0; i < DataChunks.Count; i++)
+            {
+                size += writer.WriteInt64(DataChunks[i].CompressedSize);
+                size += writer.WriteInt64(DataChunks[i].DecompressedSize);
+            }
 
-            size += writer.Write(Data);
+            for (int i = 0; i < DataChunks.Count; i++)
+                size += writer.Write(DataChunks[i].CompressedData);
+
             size += writer.WriteUEString(Material);
 
-            size += writer.Write(JFIFJunk);
+            size += writer.WriteInt32(Something1);
+            size += writer.WriteInt32(Something2);
+            size += writer.WriteInt32(Something3);
+            size += writer.WriteInt32(Something4);
+            size += writer.Write(Something5);
+
+            size += writer.WriteInt64(JFIFData.Length);
             size += writer.Write(JFIFData);
 
             for (int i = 0; i < Properties.Count; i++)
@@ -136,7 +125,81 @@ namespace GvasFormat.Serialization.HotWheels
             return size;
         }
 
+        #region Helpers
+        private short DeserializeDataChunkCount(short ChunkCount)
+        {
+            var setCounts = ChunkCount - (ChunkCount % 2); //subtract the remainder for an unknown reason
+            setCounts += 2; //add 2 for the always existant data set's values
+            setCounts /= 2; //divide by 2 to get the number of sets
+            return (short)(setCounts);
+        }
+        private short SerializeDataChunkCount()
+        {
+            var setCounts = DataChunks.Count - 1; //subtract one for the always existant data set
+            setCounts *= 2; //multiply by two to get the number of values
+            setCounts += isChunkSizeOdd ? 1 : 0; //add the remainder for an unknown reason
+            return (short)(setCounts);
+        }
+        public long GetTotalCompressedDataSize()
+        {
+            long result = 0;
+            if (DataChunks != null) DataChunks.ForEach(x => result += x.CompressedSize);
+            return result;
+        }
+        public long GetTotalDecompressedDataSize()
+        {
+            long result = 0;
+            if (DataChunks != null) DataChunks.ForEach(x => result += x.DecompressedSize);
+            return result;
+        }
+        #endregion
 
+        public Guid Guid { get; set; }
+        public string LiveryName { get; set; }
+        public List<string> Tags { get; set; } = new List<string>();
+        public byte[] Unknown { get; set; }
+        public bool isChunkSizeOdd { get; set; }
+        public Int64 MaxDecompressedDataSize { get; set; }
+        public Int64 MaxCompressedDataSize { get; set; }
+        public List<DataChunk> DataChunks { get; set; } = new List<DataChunk>();
+        public string Material { get; set; }
+        public int Something1 { get; set; }
+        public int Something2 { get; set; }
+        public int Something3 { get; set; }
+        public int Something4 { get; set; }
+        public byte Something5 { get; set; }
+        public byte[] JFIFData { get; set; }
+        public List<UEProperty> Properties { get; set; } = new List<UEProperty>();
+        public string Vehicle { get; set; }
+        public List<string> Versions { get; set; } = new List<string>();
+
+        public class DataChunk
+        {
+            public DataChunk() { }
+            public DataChunk(GvasReader reader, long compressedSize, long initalDecompressedSize)
+            {
+                UnmodifiedCompressedData = reader.ReadBytes((int)compressedSize);
+                DecompressedData = ZLibExtensions.Decompress(UnmodifiedCompressedData);
+                if (DecompressedData.Length != initalDecompressedSize)
+                    throw new FormatException($"Mismatching Decompressed Length! Expected {initalDecompressedSize} but got {DecompressedData.Length}");
+            }
+            public byte[] UnmodifiedCompressedData { get; set; }
+            public byte[] DecompressedData { get; set; }
+            public byte[] CompressedData
+            {
+                get
+                {
+                    #pragma warning disable CS0162 // Unreachable code detected
+                    if (DEV_DoNotModifyDataChunks) return UnmodifiedCompressedData;
+                    else return ZLibExtensions.Compress(DecompressedData);
+                    #pragma warning restore CS0162 // Unreachable code detected
+                }
+            }
+       
+            public long CompressedSize => CompressedData.Length;
+            public long DecompressedSize => DecompressedData.Length;
+            
+        }
     }
 
 }

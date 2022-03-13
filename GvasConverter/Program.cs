@@ -44,7 +44,7 @@ namespace GvasConverter
                     Converter.SavToJson(results.Input, results.Output);
                     break;
                 case ArgsPraser.OperationType.AccuracyTest:
-                    Converter.AccuracyTest(results.Input);
+                    Converter.AccuracyTest(results.Input, results.Output);
                     break;
             }
         }
