@@ -85,6 +85,10 @@ namespace GvasFormat.Utils
         {
             return Write(BitConverter.GetBytes(value));
         }
+        public long WriteUInt16(ushort value)
+        {
+            return Write(BitConverter.GetBytes(value));
+        }
         public long WriteInt16(short value)
         {
             return Write(BitConverter.GetBytes(value));

@@ -56,8 +56,8 @@ namespace GvasFormat.Converters
                     return jo.ToObject<UESetProperty>(serializer);
                 case "ByteProperty":
                     return jo.ToObject<UEByteProperty>(serializer);
-                case HWUDownloadedLiveries.PropertyType:
-                    return jo.ToObject<HWUDownloadedLiveries>(serializer);
+                case DownloadedLiveries.PropertyType:
+                    return jo.ToObject<DownloadedLiveries>(serializer);
                 default:
                     if (name == UENoneProperty.PropertyName) return jo.ToObject<UENoneProperty>(serializer);
                     else if (name == UEHomelessString.PropertyName) return jo.ToObject<UEHomelessString>(serializer);
@@ -84,7 +84,7 @@ namespace GvasFormat.Converters
                     case "Quat":
                         return jo.ToObject<UEQuaternionStructProperty>(serializer);
                     case "VehicleEditorProject":
-                        return jo.ToObject<HWUVehicleEditorProject>(serializer);
+                        return jo.ToObject<VehicleEditorProject>(serializer);
                     case TileMarketingDownloadedTexture.PropertyName:
                         return jo.ToObject<TileMarketingDownloadedTexture>(serializer);
                     default:

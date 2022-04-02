@@ -14,7 +14,7 @@ namespace GvasFormat.Serializer
     {
         internal static UEProperty DeserializeHWUSpecialByteArray(GvasReader reader, string itemType, string name)
         {
-            return new HWUDownloadedLiveries(reader, name);
+            return new DownloadedLiveries(reader, name);
         }
         /// <param name="valueLength">Leave as -1 for properties that are nested within another</param>
         internal static UEProperty DeserializeSpecialHWUStruct(GvasReader reader, string name, string valueType, string propertyName, int valueLength)
@@ -28,7 +28,7 @@ namespace GvasFormat.Serializer
             switch (structType)
             {
                 case "VehicleEditorProject":
-                    result = new HWUVehicleEditorProject(reader, name, type, structType, valueLength);
+                    result = new VehicleEditorProject(reader, name, type, structType, valueLength);
                     break;
                 default:
                     result = null;
@@ -39,16 +39,16 @@ namespace GvasFormat.Serializer
 
         internal static bool CanDeserializeHWUSpecialByteArray(string itemType, string name)
         {
-            return HWUDownloadedLiveries.CanDeserialize(itemType, name);
+            return DownloadedLiveries.CanDeserialize(itemType, name);
         }
         internal static bool CanSerializeHWUSpecialByteArray(string itemType, UEProperty[] items, string name)
         {
-            return HWUDownloadedLiveries.CanSerialize(itemType, items, name);
+            return DownloadedLiveries.CanSerialize(itemType, items, name);
         }
         internal static bool IsHWUSpecialSerializable(string name, string type)
         {
             return name == TileMarketingDownloadedTexture.PropertyName ||
-                type == HWUDownloadedLiveries.PropertyType;
+                type == DownloadedLiveries.PropertyType;
         }
         internal static bool IsHWUMappedStructTerminator(UEProperty value)
         {

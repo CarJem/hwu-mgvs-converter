@@ -9,19 +9,19 @@ using GvasFormat.Serializer;
 
 namespace GvasFormat.Serialization.HotWheels
 {
-    public class HWULiveryRemoteGameData
+    public class LiveryRemoteGameData
     {
         public long HeaderUnknownA { get; set; }
         public int HeaderUnknownB { get; set; }
         public string Type { get; set; }
         public List<UEProperty> Properties { get; set; } = new List<UEProperty>();
         public byte[] UnknownA { get; set; }
-        public HWUVehicleEditorProject Project { get; set; }
+        public VehicleEditorProject Project { get; set; }
         public byte[] UnknownB { get; set; }
 
 
-        public HWULiveryRemoteGameData() { }
-        public HWULiveryRemoteGameData(GvasReader reader)
+        public LiveryRemoteGameData() { }
+        public LiveryRemoteGameData(GvasReader reader)
         {
             HeaderUnknownA = reader.ReadInt64();
             HeaderUnknownB = reader.ReadInt32();
@@ -38,7 +38,7 @@ namespace GvasFormat.Serialization.HotWheels
 
             UnknownA = reader.ReadBytes(4);
 
-            Project = new HWUVehicleEditorProject(reader, "", "StructProperty", "VehicleEditorProject", -1);
+            Project = new VehicleEditorProject(reader, "", "StructProperty", "VehicleEditorProject", -1);
 
             UnknownB = reader.ReadBytes(4);
 

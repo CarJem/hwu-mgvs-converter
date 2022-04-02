@@ -7,27 +7,27 @@ using GvasFormat.Serializer;
 
 namespace GvasFormat.Serialization.HotWheels
 {
-    public class HWUDownloadedLiveries : UEProperty
+    public class DownloadedLiveries : UEProperty
     {
         public const string PropertyType = "HWUDownloadedLiveries";
         public const string OriginalType = "ByteProperty";
         public const string OriginalName = "DownloadedLiveries";
-        public List<HWULiveryRemoteGameData> Items { get; set; } = new List<HWULiveryRemoteGameData>();
+        public List<LiveryRemoteGameData> Items { get; set; } = new List<LiveryRemoteGameData>();
 
-        public HWUDownloadedLiveries()
+        public DownloadedLiveries()
         {
             Type = PropertyType;
             Name = OriginalName;
         }   
 
-        public HWUDownloadedLiveries(GvasReader reader, string name) : base (name, PropertyType, -1)
+        public DownloadedLiveries(GvasReader reader, string name) : base (name, PropertyType, -1)
         {
             var arrayLength = reader.ReadInt32();
             var size = reader.ReadInt32();
 
             for (int i = 0; i < size; i++)
             {
-                Items.Add(new HWULiveryRemoteGameData(reader));
+                Items.Add(new LiveryRemoteGameData(reader));
             }
         }
 
